@@ -1,4 +1,4 @@
-import { PublicKey, Field, Struct, Poseidon } from "snarkyjs";
+import { PublicKey, Field, Struct, Poseidon } from "o1js";
 import { UID } from "../lib/uid.js";
 
 export class ProvableElector extends Struct({

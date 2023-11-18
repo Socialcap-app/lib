@@ -1,4 +1,4 @@
-import { Field, Bool, MerkleMapWitness } from "snarkyjs"
+import { Field, Bool, MerkleMapWitness } from "o1js"
 
 let l: Bool[] = [Bool(true), Bool(false)];
 let s: Field[] = [];

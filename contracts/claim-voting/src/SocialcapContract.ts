@@ -1,5 +1,5 @@
-import { SmartContract, state, State, method } from "snarkyjs";
-import { Field, UInt64, AccountUpdate, DeployArgs, Permissions, PublicKey, Provable } from "snarkyjs";
+import { SmartContract, state, State, method } from "o1js";
+import { Field, UInt64, AccountUpdate, DeployArgs, Permissions, PublicKey, Provable } from "o1js";
 import { aMember } from "./tests/mockups";
 
 /**

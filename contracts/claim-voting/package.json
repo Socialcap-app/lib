@@ -1,6 +1,6 @@
 {
   "name": "@socialcap/contracts",
-  "version": "0.1.27",
+  "version": "0.1.28",
   "description": "SocialCap SmartContracts for zkApp and API services",
   "author": "MAZito <mario@socialcap.app>",
   "license": "Apache-2.0",
@@ -47,7 +47,6 @@
   "dependencies": {
     "axios": "^1.4.0",
     "dotenv": "^16.3.1",
-    "o1js": "^0.14.1",
-    "snarkyjs": "^0.12.1"
+    "o1js": "^0.14.1"
   }
 }

@@ -1,8 +1,8 @@
 import 'dotenv/config';
-import { Mina, PrivateKey, PublicKey, Field } from 'snarkyjs';
+import { Mina, PrivateKey, PublicKey, Field } from 'o1js';
 import { ClaimsVotingFactory } from "../claims-voting-factory.js";
 import { rollupClaims } from "../claims-roller.js";
-import { VotingContract } from '../VotingContract.js';
+import { ClaimVotingContract } from '../ClaimVotingContract.js';
 import { sendVote, addElectorsToNullifier, getNullifierProxy } from './voting-tests-helpers.js';
 
 import { startTest, getAccountsForTesting, getArgvs } from './test-helpers.js';
@@ -10,7 +10,7 @@ import { deployContract, useContract } from '../deploy/deploy-helpers.js';
 
 console.log("\n-------------------------------------------------------------------------------------------------------------");
 
-startTest("VotingContract");
+startTest("ClaimVotingContract");
 
 let [netw, proofsEnabled] = getArgvs();
 
@@ -21,7 +21,7 @@ let {
 } = await getAccountsForTesting(netw, proofsEnabled);
 
 console.log("\nCompiling contract ...");
-await VotingContract.compile();
+await ClaimVotingContract.compile();
 
 // now open ONE Claim
 let ADDR="B62qpakD3CRKEWYqFjxxowMvrHswkretnDXBkcGg1PLgyNF2iVpF3Na";

@@ -1,5 +1,5 @@
-import { SmartContract, state, State, method, MerkleMap, MerkleMapWitness, Circuit, Reducer, Struct } from "snarkyjs";
-import { Field, UInt32, Bool } from "snarkyjs";
+import { SmartContract, state, State, method, MerkleMap, MerkleMapWitness, Circuit, Reducer, Struct } from "o1js";
+import { Field, UInt32, Bool } from "o1js";
 import { MerkleMapUpdate, LeafInstance, MerkleMapProxy } from "../CommunitiesContract.js";
 import { ProvableCommunity } from "../models/provable-community.js";
 import { ProvablePerson } from "../models/provable-person.js";

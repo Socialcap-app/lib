@@ -1,4 +1,4 @@
-import { Mina, PrivateKey, PublicKey, AccountUpdate,} from 'snarkyjs';
+import { Mina, PrivateKey, PublicKey, AccountUpdate,} from 'o1js';
 import { UID } from "../lib/uid.js";
 
 import { ClaimingsContract } from "..//ClaimingsContract.js";

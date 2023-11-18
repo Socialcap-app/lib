@@ -1,5 +1,5 @@
 import 'dotenv/config';
-import { Mina, PrivateKey, PublicKey, Field, UInt64 } from 'snarkyjs';
+import { Mina, PrivateKey, PublicKey, Field, UInt64 } from 'o1js';
 import { ClaimsVotingFactory } from "../claims-voting-factory.js";
 import { rollupClaims } from "../claims-roller.js";
 import { sendVote, addElectorsToNullifier, getNullifierProxy } from './voting-tests-helpers.js';

@@ -1,5 +1,5 @@
 
-import { Field, Struct, CircuitString, PublicKey, Poseidon } from 'snarkyjs';
+import { Field, Struct, CircuitString, PublicKey, Poseidon } from 'o1js';
 import { UID } from "../lib/uid.js";
 import { UTCDateTime } from "../lib/datetime.js";
 import { TASK_STATES } from "./states.js";

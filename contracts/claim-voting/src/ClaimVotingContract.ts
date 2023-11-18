@@ -1,6 +1,6 @@
-import { SmartContract, state, State, method, Reducer, PublicKey } from "snarkyjs";
-import { Field, Bool, Struct, Circuit, Poseidon } from "snarkyjs";
-import { MerkleMapWitness } from "snarkyjs";
+import { SmartContract, state, State, method, Reducer, PublicKey } from "o1js";
+import { Field, Bool, Struct, Circuit, Poseidon } from "o1js";
+import { MerkleMapWitness } from "o1js";
 
 class Votes extends Struct({
   total: Field,
@@ -56,7 +56,7 @@ const
   CANCELED = Field(3); // TODO: not sure how can we change this state ?
 
 
-export class VotingContract extends SmartContract {
+export class ClaimVotingContract extends SmartContract {
   // events to update Nullifier
   events = {
     'elector-has-voted': Field,

@@ -6,7 +6,7 @@ import {
   Mina,
   PrivateKey,
   PublicKey
-} from 'snarkyjs';
+} from 'o1js';
 
 import { MerkleMapUpdate, MerkleMapProxy } from "../CommunitiesContract.js";
 import { ClaimingsContract } from "../ClaimingsContract.js"

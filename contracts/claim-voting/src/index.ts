@@ -15,8 +15,7 @@ import { MerkleMapProxy, MerkleMapUpdate, LeafInstance } from "./CommunitiesCont
 import { CommunitiesContract } from "./CommunitiesContract.js";
 import { ClaimingsContract } from "./ClaimingsContract.js";
 import { ElectorsContract } from "./ElectorsContract.js";
-import { VotingContract, NullifierProxy } from "./VotingContract.js";
-import { PlanVotingContract } from "./PlanVotingContract.js";
+import { ClaimVotingContract, NullifierProxy } from "./ClaimVotingContract.js";
 import { VotingInstance, ClaimsVotingFactory } from "./claims-voting-factory.js";
 
 import {
@@ -32,8 +31,7 @@ export {
   CommunitiesContract,
   ClaimingsContract,
   ElectorsContract,
-  VotingContract,
-  PlanVotingContract,
+  ClaimVotingContract,
   VotingInstance,
   ClaimsVotingFactory,
   ProvableCommunity, 

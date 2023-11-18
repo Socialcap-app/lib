@@ -1,16 +1,14 @@
-import { Field, Mina, PrivateKey, PublicKey, AccountUpdate, fetchAccount, SmartContract } from "snarkyjs";
+import { Field, Mina, PrivateKey, PublicKey, AccountUpdate, fetchAccount, SmartContract } from "o1js";
 import { CommunitiesContract, MerkleMapUpdate } from "../CommunitiesContract.js";
 import { ElectorsContract } from "../ElectorsContract.js";
 import { ClaimingsContract } from "../ClaimingsContract.js";
 import { SocialcapContract } from "../SocialcapContract.js";
-import { PlanVotingContract } from "../PlanVotingContract.js";
 
 const CONTRACTS: any = {
   "Electors": ElectorsContract,
   "Claimings": ClaimingsContract,
   "Communities": CommunitiesContract,
-  "Socialcap": SocialcapContract,
-  "PlanVoting": PlanVotingContract
+  "Socialcap": SocialcapContract
 } ;
 
 const DEPLOY_TX_FEE = 300_000_000;
@@ -132,7 +130,7 @@ async function loopUntilAccountExists({
       eachTimeNotExist();
       await new Promise((resolve) => setTimeout(resolve, 5000));
     } else {
-      // TODO add optional check that verification key is correct once this is available in SnarkyJS
+      // TODO add optional check that verification key is correct once this is available in o1js
       return response.account!;
     }
   }

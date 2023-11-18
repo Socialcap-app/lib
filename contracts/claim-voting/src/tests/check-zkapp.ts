@@ -1,4 +1,4 @@
-import { Field, Mina, PrivateKey, PublicKey, AccountUpdate, fetchAccount } from "snarkyjs";
+import { Field, Mina, PrivateKey, PublicKey, AccountUpdate, fetchAccount } from "o1js";
 import { CommunitiesContract, MerkleMapUpdate } from "../CommunitiesContract.js";
 import { ElectorsContract } from "../ElectorsContract.js";
 import { ClaimingsContract } from "../ClaimingsContract.js";

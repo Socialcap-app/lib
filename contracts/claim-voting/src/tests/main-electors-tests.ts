@@ -1,5 +1,5 @@
 import 'dotenv/config';
-import { Mina, PrivateKey, PublicKey, AccountUpdate, fetchAccount} from 'snarkyjs';
+import { Mina, PrivateKey, PublicKey, AccountUpdate, fetchAccount} from 'o1js';
 import { UID } from "../lib/uid.js";
 import { ElectorsContract } from "../ElectorsContract.js";
 import { testUpdateTask, testUpdateNullifier } from "./root-tests-helpers-03.js"

@@ -1,4 +1,4 @@
-import { Field, Struct, Poseidon } from "snarkyjs";
+import { Field, Struct, Poseidon } from "o1js";
 import { UID } from "../lib/uid.js";
 import { EntityState } from "./entity-state.js";
 

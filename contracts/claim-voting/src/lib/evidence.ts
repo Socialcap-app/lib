@@ -1,4 +1,4 @@
-import { Poseidon, Field } from "snarkyjs";
+import { Poseidon, Field } from "o1js";
 
 /**
  * Hash using Poseidon an arbitrary object, or string.

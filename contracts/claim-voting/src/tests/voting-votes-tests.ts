@@ -1,12 +1,12 @@
 import 'dotenv/config';
-import { Mina, PrivateKey, PublicKey, Field } from 'snarkyjs';
+import { Mina, PrivateKey, PublicKey, Field } from 'o1js';
 import { ClaimsVotingFactory } from "../claims-voting-factory.js";
 import { rollupClaims } from "../claims-roller.js";
 import { sendVote, addElectorsToNullifier, getNullifierProxy } from './voting-tests-helpers.js';
 
 import { startTest, getAccountsForTesting, getArgvs } from './test-helpers.js';
 
-startTest("VotingContract");
+startTest("ClaimVotingContract");
 
 let [netw, proofsEnabled] = getArgvs();
 

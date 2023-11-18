@@ -1,6 +1,6 @@
-import { Mina, Field, PrivateKey, PublicKey, UInt64 } from 'snarkyjs';
+import { Mina, Field, PrivateKey, PublicKey, UInt64 } from 'o1js';
 import { VotingInstance, ClaimsVotingFactory } from "./claims-voting-factory.js";
-import { VotingContract } from './VotingContract.js';
+import { ClaimVotingContract } from './ClaimVotingContract.js';
 
 export { rollupClaims };
 

@@ -1,5 +1,5 @@
-import { PrivateKey, PublicKey, Mina, Field, AccountUpdate, fetchAccount } from "snarkyjs";
-import { VotingContract } from "./VotingContract.js";
+import { PrivateKey, PublicKey, Mina, Field, AccountUpdate, fetchAccount } from "o1js";
+import { ClaimVotingContract } from "./ClaimVotingContract.js";
 import { checkTransaction } from "./tests/test-helpers.js";
 
 export { ClaimsVotingFactory, VotingInstance };
@@ -29,7 +29,7 @@ async function compileVotingContract(proofsEnabled?: boolean) {
   console.log("proofs enabled=", proofsEnabled);
   console.log("compiling Contract ...");
   if (proofsEnabled) 
-    await VotingContract.compile();
+    await ClaimVotingContract.compile();
   console.log("compiled !");
   isCompiled = true;
 }
@@ -44,14 +44,14 @@ async function deployVotingContract(
   isLocal?: boolean
 ): Promise<VotingInstance> {
   // we ALWAYS compile it
-  await VotingContract.compile();
+  await ClaimVotingContract.compile();
 
   // we need to generate a new key pair for each deploy
   const zkAppKey = PrivateKey.random();
   const zkAppAddr = zkAppKey.toPublicKey();
   console.log(`\nzkApp instance address=${zkAppAddr.toBase58()}`);
 
-  let zkApp = new VotingContract(zkAppAddr);
+  let zkApp = new ClaimVotingContract(zkAppAddr);
   console.log("zkApp instance created!");
   
   // deploy it 
@@ -130,7 +130,7 @@ async function getVotingInstance(
   console.log("zkApp account exists ?", response);
   console.log("zkApp status=", response.account?.zkapp?.appState);
 
-  let zkApp = new VotingContract(publicKey);
+  let zkApp = new ClaimVotingContract(publicKey);
   console.log("zkApp instance created!");
   
   // get some value after creating just for checking
@@ -179,7 +179,7 @@ async function loopUntilAccountExists({
       eachTimeNotExist();
       await new Promise((resolve) => setTimeout(resolve, 5000));
     } else {
-      // TODO add optional check that verification key is correct once this is available in SnarkyJS
+      // TODO add optional check that verification key is correct once this is available in o1js
       return response.account!;
     }
   }

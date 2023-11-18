@@ -6,7 +6,7 @@ import {
   Mina,
   PrivateKey,
   PublicKey
-} from 'snarkyjs';
+} from 'o1js';
 
 import { MerkleMapUpdate, LeafInstance, MerkleMapProxy } from "../CommunitiesContract.js";
 import { ElectorsContract } from "../ElectorsContract.js"
