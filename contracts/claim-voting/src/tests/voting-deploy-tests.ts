@@ -25,7 +25,7 @@ await ClaimsVotingFactory.compile();
 
 // now deploy  ONE Claim
 let zkClaim1 = await ClaimsVotingFactory.deploy(
-  UID.toField(claimUid), // claimUid (simulated)
+  Field(1001), //UID.toField(claimUid), // claimUid (simulated)
   Field(3), // 3 total votes required
   Field(2),  // 2 positives is approved
   deployerAccount, deployerKey
