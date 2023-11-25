@@ -1,25 +1,6 @@
-/**
- * ClaimVotingContract 
- * This is a varianr of the original IndividualClaimVotingContract, modified
- * to allow batch voting. 
- * 
- * Electors now send votes in batches and so we need to extract each vote
- * from the batch and then send them one by one to each ClaimVoting account.
- * 
- * To verify that the votes have note been tampered, we also receive the root
- * of a MerkleTree generated for the batch, settled in Mina by a transaction
- * to the VotingBatches contract. Each leaf in this tree is a Poseidon hash 
- * of [electorPubkey, claimUid, voteResult].
- * 
- * To finally send each vote (a leaf) to the ClaimVoting account, we need a 
- * witness to this leaf, the root and also the electorPubkey, cliamUid and 
- * voteResult, so we can verify that this vote is in the batch MerkleTree 
- * before dispatching the VoteAction.
- */
-
-import { SmartContract, state, State, method, Reducer, PublicKey, Nullifier } from "o1js";
+import { SmartContract, state, State, method, Reducer, PublicKey } from "o1js";
 import { Field, Bool, Struct, Circuit, Poseidon } from "o1js";
-import { MerkleWitness, MerkleMapWitness } from "o1js";
+import { MerkleMapWitness } from "o1js";
 
 class Votes extends Struct({
   total: Field,
@@ -35,42 +16,20 @@ class VoteAction extends Struct({
   ignore: Bool,
 }){}
 
-export class VoteLeaf extends Struct({}) {
-  static hash(
-    electorPuk: PublicKey, 
-    claimUid: Field,
-    result: Field 
-  ): Field {
-    const hashed = Poseidon.hash(
-      electorPuk.toFields()
-      .concat(claimUid.toFields())
-      .concat(result.toFields())
-    );
-    return hashed;
-  } 
-}
-
-export class NullifierLeaf extends Struct({}) {
-  static key(
-    electorPuk: PublicKey, 
-    claimUid: Field
-  ): Field {
-    const hashed = Poseidon.hash(
-      electorPuk.toFields()
+export class NullifierProxy extends Struct({
+  root: Field,
+  witness: MerkleMapWitness
+}) {
+  static key(electorId: PublicKey, claimUid: Field): Field {
+    Circuit.log(electorId, claimUid)
+    const keyd = Poseidon.hash(
+      electorId.toFields()
       .concat(claimUid.toFields())
     );
-    return hashed;
+    Circuit.log("Key (",electorId, claimUid, ") =>", keyd)
+    return keyd;
   } 
 }
-
-const MERKLE_HEIGHT = 10;
-class VotingBatchWitness extends MerkleWitness(MERKLE_HEIGHT) {}
-
-class VotedEvent extends Struct({
-  electorPuk: PublicKey,
-  claimUid: Field,
-  hasVoted: Bool,
-}) {}
 
 class VotingStatusEvent extends Struct({
   claimUid: Field,
@@ -100,7 +59,7 @@ const
 export class ClaimVotingContract extends SmartContract {
   // events to update Nullifier
   events = {
-    'elector-has-voted': VotedEvent,
+    'elector-has-voted': Field,
     'voting-changed': VotingStatusEvent
   };
 
@@ -174,65 +133,45 @@ export class ClaimVotingContract extends SmartContract {
   @method assertHasNotVoted(
     electorPuk: PublicKey,
     claimUid: Field,
-    nullifierRoot: Field,
-    nullifierWitness: MerkleMapWitness
+    nullifier: NullifierProxy
   ) {
     // compute a root and key from the given Witness using the only valid 
     // value ASSIGNED, other values indicate that the elector was 
     // never assigned to this claim or that he has already voted on it
-    const [witnessRoot, witnessKey] = nullifierWitness.computeRootAndKey(
+    const [witnessRoot, witnessKey] = nullifier.witness.computeRootAndKey(
       ASSIGNED /* WAS ASSIGNED BUT NOT VOTED YET */
     );
     Circuit.log("assertHasNotVoted witnessRoot", witnessRoot);
     Circuit.log("assertHasNotVoted witnessKey", witnessKey);
 
     // check the witness obtained root matchs the Nullifier root
-    nullifierRoot.assertEquals(witnessRoot, "Invalid elector root or already voted") ;
+    nullifier.root.assertEquals(witnessRoot, 
+      "Invalid elector root or already voted") ;
 
     // check the witness obtained key matchs the elector+claim key 
-    const key: Field = NullifierLeaf.key(electorPuk, claimUid);
+    const key: Field = NullifierProxy.key(electorPuk, claimUid);
     Circuit.log("assertHasNotVoted recalculated Key", key);
 
-    witnessKey.assertEquals(key, "Invalid elector key or already voted");
+    witnessKey.assertEquals(key, 
+      "Invalid elector key or already voted");
   }
 
 
-  @method assertIsInBatch(
-    electorPuk: PublicKey,
-    claimUid: Field,
-    vote: Field,
-    batchRoot: Field,
-    batchWitness: VotingBatchWitness
-  ) {
-    let leafValue = VoteLeaf.hash(electorPuk, claimUid, vote);
-    let recalculatedRoot = batchWitness.calculateRoot(leafValue);
-    recalculatedRoot.assertEquals(batchRoot);  
-  }
-
-
-  @method dispatchVote(
-    electorPuk: PublicKey, 
+  @method confirmTaskDone(
     vote: Field, // +1 positive, -1 negative or 0 ignored
-    batchRoot: Field,
-    batchWitness: VotingBatchWitness, 
-    nullifierRoot: Field,
-    nullifierWitness: MerkleMapWitness
+    nullifier: NullifierProxy
   ) {
     const claimUid = this.claimUid.get();
     this.claimUid.assertEquals(claimUid);
-    Circuit.log("dispatchVote for claimUid=", claimUid);
+    Circuit.log("sendVote claimUid=", claimUid);
     
-    // check if this elector has already voted in the claimUid
-    this.assertHasNotVoted(
-      electorPuk, claimUid, 
-      nullifierRoot, nullifierWitness
-    );
-
-    // check it is part of the batch merkle tree
-    this.assertIsInBatch(
-      electorPuk, claimUid, vote,
-      batchRoot, batchWitness
-    );
+    // the elector Pub key is the one sending the Tx
+    let electorPuk = this.sender;
+    electorPuk.assertEquals(this.sender);
+    
+    // check this elector was assigned AND has not voted on this claim before
+    Circuit.log("sendVote key=", NullifierProxy.key(electorPuk, claimUid));
+    this.assertHasNotVoted(electorPuk, claimUid, nullifier);
 
     // get current votes state
     let positives = this.positive.getAndAssertEquals();
@@ -258,11 +197,8 @@ export class ClaimVotingContract extends SmartContract {
     Circuit.log("dispatched action", action);
 
     // send event to change this elector state in Nullifier
-    this.emitEvent("elector-has-voted", {
-      electorPuk: electorPuk,
-      claimUid: claimUid,
-      hasVoted: Bool(true)
-    });
+    let key: Field = NullifierProxy.key(electorPuk, claimUid);
+    this.emitEvent("elector-has-voted", key);
   }
 
 

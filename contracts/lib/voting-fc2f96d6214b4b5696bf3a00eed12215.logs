@@ -1,0 +1,10 @@
+
+Begin testing 'VotingContract' at= 2023-08-01T04:51:21.072Z
+
+Using network=Berkeley, proofsEnabled=true
+
+Run on Mina.Berkeley
+deployer Addr= B62qo1gZFRgGhsozfGeqHv9bbkACr2sHA7qRsf4r9Tadk3dHH3Fwwmy
+sender Addr= B62qixo7ZaNjibjRh3dhU1rNLVzNUqDtgwyUB6n9xxYFrHEHmfJXbBf
+proofs enabled= true
+compiling Contract ...
