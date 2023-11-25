@@ -1,13 +1,26 @@
-# Socialcap
+# Socialcap ZK Contracts
 
-A community based credentials protocol and zkApp on [MINA](https://minaprotocol.com), focused in solving the challenge of verifying the authenticity of credentials in the digital world.
+These are the different ZK contracts and tools used by Socialcap to settle on-chain voting.
 
-**Why ?**
+- **batch-voting**: The contract use to settle batches of votes submitted by electors when voting for a set of claims.
 
-With the growing importance of credentials in Web3 communities as both a social and professional "signal" (as demonstrated by the popularity of POAPs and other NFTs used to show wealth or belonging), it's crucial to have a streamlined, trusted and reliable system for validating claims.  
+- **claim-voting**: The contract used to vote for a given claim and calculate the result.
 
-Our community-based attestation protocol, complemented by a user-friendly zkApp, enables easy self validation and issuance of credentials using a transparent and repeatable process, while preserving privacy and confidentiality.
+- **collections**: The contract for settling a given collection MerkleMap commitment.
 
-Unlike other solutions which mainly store and issue credentials but don’t provide a reliable validation process to authenticate them (relying on third parties or Kleros courts), we focus on establishing a trustable and reliable process for validating the authenticity of the claimed credentials and the provided data.
+- **models**: The set of "provable" entity definitions used by the API or UI.
 
-Our protocol aims to build trust among members, reduce the risk of fraud, and ensure a streamlined, transparent, reliable, and repeatable credential issuing process.
+- **lib**: Utility libs used by other contracts, the API or the UI.
+
+The corresponding `npm` packages are:
+
+- @socialcap/batch-voting-contracts
+- @socialcap/claim-voting-contracts
+- @socialcap/collection-contracts
+- @socialcap/models
+- @socialcap/lib
+
+### Changelog
+
+- updated to o1js 0.14.2
+- refactored into different folders
