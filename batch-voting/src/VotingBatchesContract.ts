@@ -1,7 +1,6 @@
 import { SmartContract, state, State, method, Reducer, PublicKey } from "o1js";
 import { Field, Struct, Circuit, Poseidon } from "o1js";
 import { MerkleMapWitness, MerkleMap, MerkleWitness } from "o1js";
-import { MerkleMapUpdate } from "./merkle-updates.js";
 
 export {
   VotesBatch, 
@@ -11,6 +10,7 @@ export {
   MERKLE_HEIGHT
 }
 
+
 /** States of the Voting process */
 const 
   ACTIVE = 1,
@@ -18,8 +18,10 @@ const
   CANCELED = 3;
 
 /**
- * This is an actual batch of votes sent by a given elector, on a given
- * voting process (the planUid represents this voting process).
+ * This is an actual batch of votes sent by a specific voter in a particular
+ * voting process. The planUid represents this specific voting process, serving as
+ * the Uid of a designated Credential MasterPlan voting strategy, and the params
+ * are configured as set up by a particular community.
  */
 class VotesBatch extends Struct({
   uid: Field, // an unique Uid for this batch
@@ -28,18 +30,18 @@ class VotesBatch extends Struct({
   electorPubkey: PublicKey, // the elector Uid who submitted this batch
   commited: Field, // the Root of the batch MerkleTree
   size: Field, // Total number of votes received in this batch
-  submitedUTC: Field 
+  submittedUTC: Field 
 }){}
 
 /**
- * This action will be dispatched by the receiveVotesBatch @method
+ * This action will be dispatched by the receiveVotesBatch method
  * when a new batch of votes is received. We use "actions" here because
- * we want this to be settled in MINA archive nodes.
+ * we want this to be saved in MINA archive nodes.
  */
 class VotesBatchReceivedAction extends VotesBatch {}
 
 /**
- * This event will be dispatched by the receiveVotesBatch @method
+ * This event will be dispatched by the receiveVotesBatch method
  * when a new batch of votes is received. It is assumed it will
  * be consumed by some off chain process.
  */
@@ -52,7 +54,9 @@ const
   ASSIGNED = Field(1),   // assigned to elector but has not voted yet
   VOTED = Field(2);      // assigned to elector and has already voted
 
-
+/** 
+ * 
+*/
 class ElectorsInPlanNullifierProxy extends Struct({
   root: Field,
   witness: MerkleMapWitness
@@ -71,12 +75,14 @@ class ElectorsInPlanNullifierProxy extends Struct({
   } 
 }
 
+
 /**
  * Merkle helpers
  */
 const MERKLE_HEIGHT = 8;
 
 class VotingBatchesWitness extends MerkleWitness(MERKLE_HEIGHT) {}
+
 
 /**
  * This is the voting contract binded to a given credential voting process, which
@@ -172,7 +178,7 @@ class VotingBatchesContract extends SmartContract {
   
 
   /**
-   * Receives a VotesBatch, asserts it, and emits an Action and en Event
+   * Receives a VotesBatch, asserts it, and emits an Action and an Event
    */
   @method receiveVotesBatch(
     votesBatch: VotesBatch,
