@@ -1,7 +1,7 @@
 {
   "name": "@socialcap/contracts-lib",
-  "version": "0.1.",
-  "description": "SocialCap SmartContracts for zkApp and API services",
+  "version": "0.1.2",
+  "description": "SocialCap contracts Lib for zkApp and API services",
   "author": "MAZito <mario@socialcap.app>",
   "license": "Apache-2.0",
   "keywords": [

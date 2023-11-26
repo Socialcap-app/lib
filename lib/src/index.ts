@@ -17,11 +17,13 @@ import {
   VotesInBatchNullifier,
   VotesInBatchWitness
 } from "./votes-in-batch-nullifier.js";
+import { sliced } from "./long-string.js";
 
 export {
   UID,
   UTCDateTime,
   hashData,
+  sliced,
   ElectorInClaimLeaf,
   ElectorsInClaimNullifier,
   VoteInBatchLeaf,

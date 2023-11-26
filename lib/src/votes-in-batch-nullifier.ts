@@ -1,4 +1,5 @@
 import { PublicKey, Field, Struct, Poseidon, MerkleTree, MerkleWitness} from "o1js";
+import { sliced } from "./long-string.js";
 
 export {
   VoteInBatchLeaf,
@@ -28,20 +29,21 @@ const MERKLE_HEIGHT = 8;
 
 class VotesInBatchWitness extends MerkleWitness(MERKLE_HEIGHT) {}
 
-
 class VotesInBatchNullifier {
 
     merkleTree: MerkleTree;
+    index: bigint;
 
     constructor() {
       this.merkleTree = new MerkleTree(MERKLE_HEIGHT);
+      this.index = 0n;
     }
 
     build(leafs: { value: Field }[]): this {
-      let index = this.merkleTree.leafCount;
       for (let j=0; j < (leafs || []).length; j++) {
+        let index = this.index;
         this.merkleTree.setLeaf(index, leafs[j].value); 
-        index = index + 1n;
+        this.index = this.index + 1n;
       }
       return this;
     }
@@ -55,7 +57,7 @@ class VotesInBatchNullifier {
       votes: { claimUid: Field, result: Field }[]
     ): this {
       for (let j=0; j < (votes || []).length; j++) {
-        let index = this.merkleTree.leafCount;
+        let index = this.index;
 
         let { claimUid, result } = votes[j];
         let value = VoteInBatchLeaf.value(electorPuk, claimUid, result);
@@ -66,6 +68,8 @@ class VotesInBatchNullifier {
         const circuitWitness = new VotesInBatchWitness(witness);
         const witnessRoot = circuitWitness.calculateRoot(value);
         logWitness(witnessRoot, index, value);
+
+        this.index = this.index + 1n;
       }
 
       return this;
@@ -85,10 +89,10 @@ class VotesInBatchNullifier {
 
 const logLeaf = (mt: MerkleTree, index: bigint, value: Field) => {
   console.log(`VotesInBatchNullifier addElectors()`
-    +` root=${mt.getRoot().toString()} index=${index} witnessValue=${value.toString()}`);
+    +` root=${sliced(mt.getRoot().toString())} index=${index} witnessValue=${sliced(value.toString())}`);
 }
 
 const logWitness = (root: Field, index: bigint, value: Field) => {
   console.log(`VotesInBatchNullifier addElectors()`
-    +`  witnessRoot=${root.toString()} index=${index} witnessValue=${value.toString()}`);
+    +` witnessRoot=${sliced(root.toString())} index=${index} witnessValue=${sliced(value.toString())}`);
 }
