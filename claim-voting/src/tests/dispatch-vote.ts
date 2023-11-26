@@ -23,7 +23,7 @@ export async function dispatchTheVote(
         sender.puk,
         vote, // +1 positive, -1 negative or 0 ignored
         batchRoot,
-        batchWitness, 
+        batchWitness,
         nullifierRoot,
         nullifierWitness
       ); 

@@ -17,9 +17,11 @@
  * before dispatching the VoteAction.
  */
 
-import { SmartContract, state, State, method, Reducer, PublicKey, Nullifier } from "o1js";
-import { Field, Bool, Struct, Circuit, Poseidon } from "o1js";
-import { MerkleWitness, MerkleMapWitness } from "o1js";
+import { SmartContract, state, State, method, Reducer, PublicKey } from "o1js";
+import { Field, Bool, Struct, Circuit } from "o1js";
+import { MerkleMapWitness } from "o1js";
+import { VoteInBatchLeaf, VotesInBatchWitness  } from "@socialcap/contracts-lib";
+import { ElectorInClaimLeaf } from "@socialcap/contracts-lib";
 
 class Votes extends Struct({
   total: Field,
@@ -34,37 +36,6 @@ class VoteAction extends Struct({
   negative: Bool,
   ignore: Bool,
 }){}
-
-export class VoteLeaf extends Struct({}) {
-  static hash(
-    electorPuk: PublicKey, 
-    claimUid: Field,
-    result: Field 
-  ): Field {
-    const hashed = Poseidon.hash(
-      electorPuk.toFields()
-      .concat(claimUid.toFields())
-      .concat(result.toFields())
-    );
-    return hashed;
-  } 
-}
-
-export class NullifierLeaf extends Struct({}) {
-  static key(
-    electorPuk: PublicKey, 
-    claimUid: Field
-  ): Field {
-    const hashed = Poseidon.hash(
-      electorPuk.toFields()
-      .concat(claimUid.toFields())
-    );
-    return hashed;
-  } 
-}
-
-const MERKLE_HEIGHT = 10;
-class VotingBatchWitness extends MerkleWitness(MERKLE_HEIGHT) {}
 
 class VotedEvent extends Struct({
   electorPuk: PublicKey,
@@ -181,7 +152,7 @@ export class ClaimVotingContract extends SmartContract {
     // value ASSIGNED, other values indicate that the elector was 
     // never assigned to this claim or that he has already voted on it
     const [witnessRoot, witnessKey] = nullifierWitness.computeRootAndKey(
-      ASSIGNED /* WAS ASSIGNED BUT NOT VOTED YET */
+      ElectorInClaimLeaf.ASSIGNED /* WAS ASSIGNED BUT NOT VOTED YET */
     );
     Circuit.log("assertHasNotVoted witnessRoot", witnessRoot);
     Circuit.log("assertHasNotVoted witnessKey", witnessKey);
@@ -190,7 +161,7 @@ export class ClaimVotingContract extends SmartContract {
     nullifierRoot.assertEquals(witnessRoot, "Invalid elector root or already voted") ;
 
     // check the witness obtained key matchs the elector+claim key 
-    const key: Field = NullifierLeaf.key(electorPuk, claimUid);
+    const key: Field = ElectorInClaimLeaf.key(electorPuk, claimUid);
     Circuit.log("assertHasNotVoted recalculated Key", key);
 
     witnessKey.assertEquals(key, "Invalid elector key or already voted");
@@ -202,9 +173,9 @@ export class ClaimVotingContract extends SmartContract {
     claimUid: Field,
     vote: Field,
     batchRoot: Field,
-    batchWitness: VotingBatchWitness
+    batchWitness: VotesInBatchWitness
   ) {
-    let leafValue = VoteLeaf.hash(electorPuk, claimUid, vote);
+    let leafValue = VoteInBatchLeaf.value(electorPuk, claimUid, vote);
     let recalculatedRoot = batchWitness.calculateRoot(leafValue);
     recalculatedRoot.assertEquals(batchRoot);  
   }
@@ -295,7 +266,7 @@ export class ClaimVotingContract extends SmartContract {
     electorPuk: PublicKey, 
     vote: Field, // +1 positive, -1 negative or 0 ignored
     batchRoot: Field,
-    batchWitness: VotingBatchWitness, 
+    batchWitness: VotesInBatchWitness, 
     nullifierRoot: Field,
     nullifierWitness: MerkleMapWitness
   ) {
@@ -303,6 +274,7 @@ export class ClaimVotingContract extends SmartContract {
     this.claimUid.assertEquals(claimUid);
     Circuit.log("dispatchVote for claimUid=", claimUid);
     
+/*
     // check if this elector has already voted in the claimUid
     this.assertHasNotVoted(
       electorPuk, claimUid, 
@@ -314,7 +286,6 @@ export class ClaimVotingContract extends SmartContract {
       electorPuk, claimUid, vote,
       batchRoot, batchWitness
     );
-
     // dispatch action
     const action: VoteAction = { 
       isValid: Bool(true),
@@ -338,6 +309,7 @@ export class ClaimVotingContract extends SmartContract {
     // zkApp.result.get() === APPROVED
     // zkApp.result.get() === REJECTED
     this.addVote(action);
+*/    
   }
 
 

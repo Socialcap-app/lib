@@ -1,6 +1,6 @@
 import { Mina, PrivateKey, PublicKey, Field } from 'o1js';
 import { ClaimVotingInstance, deployVotingContract, compileVotingContract } from "../claims-voting-factory.js";
-import { ElectorsInClaimNullifier, VotesInBatchNullifier } from '../../../lib/build/src/index.js';
+import { ElectorsInClaimNullifier, VotesInBatchNullifier } from '@socialcap/contracts-lib';
 import { dispatchTheVote } from './dispatch-vote.js';
 
 // set instance
