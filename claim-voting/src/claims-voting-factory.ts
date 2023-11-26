@@ -2,18 +2,16 @@ import { PrivateKey, PublicKey, Mina, Field, AccountUpdate, fetchAccount } from 
 import { ClaimVotingContract } from "./ClaimVotingContract.js";
 import { checkTransaction } from "./tests/test-helpers.js";
 
-export { ClaimsVotingFactory, VotingInstance };
+export { 
+  compileVotingContract,
+  deployVotingContract,
+  ClaimVotingInstance 
+};
 
-let proofsEnabled = false;
+let proofsEnabled = true;
 let isCompiled = false;
 
-const ClaimsVotingFactory = {
-  compile: compileVotingContract, 
-  deploy: deployVotingContract,
-  getInstance: getVotingInstance
-}
-
-type VotingInstance = {
+type ClaimVotingInstance = {
   instance: any,
   address: PublicKey,
   secret?: PrivateKey,
@@ -35,14 +33,23 @@ async function compileVotingContract(proofsEnabled?: boolean) {
 }
 
 
-async function deployVotingContract(
+async function deployVotingContract(params: {
   claimUid: Field,
   requiredVotes: Field,
   requiredPositives: Field,
   deployerAccount: PublicKey,
   deployerKey: PrivateKey,
   isLocal?: boolean
-): Promise<VotingInstance> {
+}): Promise<ClaimVotingInstance> {
+  const { 
+    claimUid, 
+    requiredVotes, 
+    requiredPositives, 
+    deployerAccount,
+    deployerKey,
+    isLocal
+  } = params;
+
   // we ALWAYS compile it
   await ClaimVotingContract.compile();
 
@@ -108,7 +115,7 @@ async function deployVotingContract(
   let actionsState = zkApp.actionsState.get(); 
   console.log("zkApp instance actionsState=", actionsState.toString())
 
-  const instance: VotingInstance = {
+  const instance: ClaimVotingInstance = {
     instance: zkApp, 
     address: zkAppAddr, 
     secret: zkAppKey,
@@ -122,7 +129,7 @@ async function deployVotingContract(
 
 async function getVotingInstance(
   publicKey: PublicKey
-): Promise<VotingInstance> {
+): Promise<ClaimVotingInstance> {
   // we need to create an instance of an already deployed contract
   console.log(`\nzkApp instance address=${publicKey.toBase58()}`);
 
@@ -137,7 +144,7 @@ async function getVotingInstance(
   let actionsState = zkApp.actionsState.get(); 
   console.log("zkApp instance actionsState=", actionsState.toString())
 
-  const instance: VotingInstance = {
+  const instance: ClaimVotingInstance = {
     instance: zkApp, 
     address: publicKey
   };

@@ -1,7 +1,7 @@
 import { Mina, PrivateKey, PublicKey, Field } from 'o1js';
-import { ClaimsVotingFactory } from "../claims-voting-factory.js";
-import { rollupClaims } from "../claims-roller.js";
-import { sendVote, addElectorsToNullifier, getNullifierProxy } from './voting-tests-helpers.js';
+import { ClaimVotingInstance, deployVotingContract, compileVotingContract } from "../claims-voting-factory.js";
+import { ElectorsInClaimNullifier, VotesInBatchNullifier } from '../../../lib/build/src/index.js';
+import { dispatchTheVote } from './dispatch-vote.js';
 
 // set instance
 const Local = Mina.LocalBlockchain({ proofsEnabled: true });
@@ -22,33 +22,22 @@ console.log("deployer Addr=", deployer.puk.toBase58());
 console.log("sender Addr=", sender.puk.toBase58());
 
 // first compile it
-await ClaimsVotingFactory.compile();
+await compileVotingContract();
+
+let claimUid = Field(1001); // the first Claim
 
 // now deploy  ONE Claim
-let zkClaim1 = await ClaimsVotingFactory.deploy(
-  Field(1001), // claimUid (simulated)
-  Field(3), // 3 total votes required
-  Field(2),  // 2 positives is approved
-  deployer.puk, deployer.prk,
-  true
-);
+let zkClaim1: ClaimVotingInstance = await deployVotingContract({
+  claimUid: claimUid, // claimUid (simulated)
+  requiredVotes: Field(3), // 3 total votes required
+  requiredPositives: Field(2),  // 2 positives is approved
+  deployerAccount: deployer.puk, 
+  deployerKey: deployer.prk,
+  isLocal: true 
+});
 
-/*
-// now deploy TWO Claims
-let zkClaim2 = await ClaimsVotingFactory.deploy(
-  Field(1002), Field(15), Field(9), 
-  deployerAccount, deployerKey
-);
 
-// now deploy THREE Claims
-let zkClaim3 = await ClaimsFactory.deploy(
-  Field(1003), Field(100), Field(51), 
-  deployerAccount, deployerKey
-);
-*/
-
-// we need to add some electors with their accountIds
-let claimUid = Field(1001); // the first Claim
+//// we need to add some electors with their accountIds ////
 
 let electors: { puk: PublicKey, prk: PrivateKey }[] = [];
 electors[0] = getLocalAccount(3);
@@ -57,60 +46,75 @@ electors[2] = getLocalAccount(5);
 electors[3] = getLocalAccount(6);
 electors[4] = getLocalAccount(7);
 
-let nullifier = addElectorsToNullifier(claimUid, 
-  [ electors[0].puk, electors[1].puk, electors[2].puk, electors[3].puk ]
-);
+let electorsInClaim = new ElectorsInClaimNullifier();
 
-// now we vote 3 times !!!
-let null00 = getNullifierProxy(nullifier, electors[0].puk, claimUid);
-await sendVote(
+let nullifier = electorsInClaim.addElectors(claimUid, [ 
+  electors[0].puk, 
+  electors[1].puk, 
+  electors[2].puk, 
+  electors[3].puk 
+]);
+
+//// need to create some batches and its Nullis ////
+
+const votes0 = [
+  { claimUid:  Field(1001), result: Field(+1)},
+  { claimUid:  Field(1002), result: Field(+1)},
+  { claimUid:  Field(1003), result: Field(+1)}
+]
+const votesInBatch0 = (new VotesInBatchNullifier()).addVotes(
+  electors[0].puk, 
+  votes0
+)
+
+const votes1 = [
+  { claimUid:  Field(1001), result: Field(+1)},
+  { claimUid:  Field(1002), result: Field(+1)},
+  { claimUid:  Field(1003), result: Field(+1)}
+]
+const votesInBatch1 = (new VotesInBatchNullifier()).addVotes(
+  electors[1].puk, 
+  votes1
+)
+
+const votes2 = [
+  { claimUid:  Field(1001), result: Field(+1)},
+  { claimUid:  Field(1002), result: Field(+1)},
+  { claimUid:  Field(1003), result: Field(+1)}
+]
+const votesInBatch2 = (new VotesInBatchNullifier()).addVotes(
+  electors[2].puk, 
+  votes2
+)
+
+//// now we dispatch the votes for this claim in each batch ////
+
+await dispatchTheVote(
   zkClaim1.instance, 
   electors[0],
-  Field(1), // positive vote!
-  null00
+  votes0[0].result, // first batch
+  votesInBatch0.root(),
+  votesInBatch0.witness(0n),
+  electorsInClaim.root(),
+  electorsInClaim.witness(electors[0].puk, claimUid)
 );
 
-let null01 = getNullifierProxy(nullifier, electors[1].puk, claimUid);
-await sendVote(
+await dispatchTheVote(
   zkClaim1.instance, 
   electors[1],
-  Field(1), // positive vote!
-  null01
+  votes1[1].result, // 2nd batch
+  votesInBatch1.root(),
+  votesInBatch1.witness(0n),
+  electorsInClaim.root(),
+  electorsInClaim.witness(electors[1].puk, claimUid)
 );
 
-let null02 = getNullifierProxy(nullifier, electors[2].puk, claimUid);
-await sendVote(
+await dispatchTheVote(
   zkClaim1.instance, 
   electors[2],
-  Field(1), // positive vote!
-  null02
+  votes2[2].result, // 3rd batch
+  votesInBatch2.root(),
+  votesInBatch2.witness(0n),
+  electorsInClaim.root(),
+  electorsInClaim.witness(electors[2].puk, claimUid)
 );
-
-// This vote MUST not be counted
-let null03 = getNullifierProxy(nullifier, electors[3].puk, claimUid);
-await sendVote(
-  zkClaim1.instance, 
-  electors[3],
-  Field(1), // positive vote!
-  null03
-);
-
-// This vote MUST FAIL because it is not in Nullifier
-await sendVote(
-  zkClaim1.instance, 
-  electors[4],
-  Field(1), // positive vote!
-  null03
-);
-
-
-// run the rollups for all open claims ...
-for (let j=0; j < 5; j++) {
-  await rollupClaims(
-    //[zkClaim1, zkClaim2, zkClaim3],
-    [zkClaim1],
-    // we should think about who will be the payer here, maybe a special 
-    // Socialcap account for this funded on demand ?
-    sender.puk, sender.prk
-  )
-}

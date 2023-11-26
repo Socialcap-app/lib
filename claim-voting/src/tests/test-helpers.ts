@@ -1,8 +1,4 @@
-import { Field, Mina, PrivateKey, PublicKey, AccountUpdate, fetchAccount } from "o1js";
-import { CommunitiesContract, MerkleMapUpdate } from "../CommunitiesContract.js";
-import { ElectorsContract } from "../ElectorsContract.js";
-import { ClaimingsContract } from "../ClaimingsContract.js";
-import { SocialcapContract } from "../SocialcapContract.js";
+import { Mina, PrivateKey, PublicKey } from "o1js";
 
 let tstart = 0;
 
@@ -20,19 +16,6 @@ export function getArgvs(): [string, boolean, string] {
 export function startTest(testName: string) {
   console.log("\nBegin testing '"+testName+"' at=", (new Date()).toISOString());
   tstart = (new Date()).getTime();
-}
-
-
-export function assertTest(
-  updated: MerkleMapUpdate,
-  updatedRoot: Field,
-) {
-  console.log("MerkleMapUpdate=", JSON.stringify(updated, null, 2));
-  console.log("updatedRoot=", updatedRoot.toString());
-  console.log("assert updatedRoot eq .afterRoot is ", updatedRoot.equals(updated.afterRoot).toBoolean());
-  let tend = (new Date()).getTime();
-  console.log("Total time=", (tend - tstart)/1000, "secs")  ;
-  console.log("Ended test at=", (new Date()).toISOString())
 }
 
 

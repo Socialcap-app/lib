@@ -1,6 +1,6 @@
 {
-  "name": "@socialcap/contracts",
-  "version": "0.1.30",
+  "name": "@socialcap/claim-voting-contracts",
+  "version": "0.1.1",
   "description": "SocialCap SmartContracts for zkApp and API services",
   "author": "MAZito <mario@socialcap.app>",
   "license": "Apache-2.0",
