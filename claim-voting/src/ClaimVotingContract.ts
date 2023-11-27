@@ -16,12 +16,18 @@
  * voteResult, so we can verify that this vote is in the batch MerkleTree 
  * before dispatching the VoteAction.
  */
-
 import { SmartContract, state, State, method, Reducer, PublicKey } from "o1js";
 import { Field, Bool, Struct, Circuit } from "o1js";
 import { MerkleMapWitness } from "o1js";
 import { VoteInBatchLeaf, VotesInBatchWitness  } from "@socialcap/contracts-lib";
 import { ElectorInClaimLeaf } from "@socialcap/contracts-lib";
+
+
+export class VoteValue extends Struct({}) {
+  static POSITIVE = Field(1);
+  static NEGATIVE = Field(2); // using -1 creates problems :-)
+  static ABSTAIN = Field(0);
+}
 
 class Votes extends Struct({
   total: Field,
@@ -35,7 +41,8 @@ class VoteAction extends Struct({
   positive: Bool,
   negative: Bool,
   ignore: Bool,
-}){}
+}){
+}
 
 class VotedEvent extends Struct({
   electorPuk: PublicKey,
@@ -54,14 +61,8 @@ class VotingStatusEvent extends Struct({
   ignored: Field
 }) {}
 
-// Voting states for an Elector on this Claim
-const 
-  UNASSIGNED = Field(0), // Claim not assigned to this elector
-  ASSIGNED = Field(1),   // Claim assigned to elector but has not voted yet
-  VOTED = Field(2);      // Claim assigned to elector and has already voted
-
 // Final result states  
-const 
+export const 
   VOTING = Field(0),   // Claim is still in the voting process
   APPROVED = Field(1),
   REJECTED = Field(2),
@@ -154,15 +155,15 @@ export class ClaimVotingContract extends SmartContract {
     const [witnessRoot, witnessKey] = nullifierWitness.computeRootAndKey(
       ElectorInClaimLeaf.ASSIGNED /* WAS ASSIGNED BUT NOT VOTED YET */
     );
-    Circuit.log("assertHasNotVoted witnessRoot", witnessRoot);
-    Circuit.log("assertHasNotVoted witnessKey", witnessKey);
+    // Circuit.log("assertHasNotVoted witnessRoot", witnessRoot);
+    // Circuit.log("assertHasNotVoted witnessKey", witnessKey);
 
     // check the witness obtained root matchs the Nullifier root
     nullifierRoot.assertEquals(witnessRoot, "Invalid elector root or already voted") ;
 
     // check the witness obtained key matchs the elector+claim key 
     const key: Field = ElectorInClaimLeaf.key(electorPuk, claimUid);
-    Circuit.log("assertHasNotVoted recalculated Key", key);
+    // Circuit.log("assertHasNotVoted recalculated Key", key);
 
     witnessKey.assertEquals(key, "Invalid elector key or already voted");
   }
@@ -210,7 +211,7 @@ export class ClaimVotingContract extends SmartContract {
     // check that we have not already finished 
     // and that we can receive additional votes
     votes.assertLessThan(requiredVotes, "Too late, voting has already finished !");
-    Circuit.log("rollupVotes votes required,total=", requiredVotes, votes);
+    // Circuit.log("rollupVotes votes required,total=", requiredVotes, votes);
 
     // use this VoteAction to reevaluate the final result
     const notFinished = votes.lessThan(requiredVotes);
@@ -218,7 +219,7 @@ export class ClaimVotingContract extends SmartContract {
     positives = Circuit.if(notFinished.and(action.positive), positives.add(1), positives);
     negatives = Circuit.if(notFinished.and(action.negative), negatives.add(1), negatives);
     ignored = Circuit.if(notFinished.and(action.ignore), ignored.add(1), ignored);
-    Circuit.log("addVote totals=", votes, positives, negatives, ignored);
+    // Circuit.log("addVote totals=", votes, positives, negatives, ignored);
 
     // update on-chain votes and actions state
     this.positive.set(positives);
@@ -238,6 +239,7 @@ export class ClaimVotingContract extends SmartContract {
       Circuit.if(isApproved, APPROVED, REJECTED),
       result
     );
+    // Circuit.log("addVote result,isFinished,isApproved=", newResult, isFinished, isApproved);
 
     // update final on-chain result state
     this.result.set(newResult);
@@ -257,16 +259,12 @@ export class ClaimVotingContract extends SmartContract {
       negative: negatives,
       ignored: ignored
     });
-
-    Circuit.log("addVote result=", newResult);
-    Circuit.log("addVote isFinished=", isFinished);
-    Circuit.log("addVote isApproved=", isApproved);
   }
 
 
   @method dispatchVote(
     electorPuk: PublicKey, 
-    vote: Field, // +1 positive, -1 negative or 0 ignored
+    vote: Field, // +1 positive, +2 negative or 0 ignored
     batchRoot: Field,
     batchWitness: VotesInBatchWitness, 
     nullifierRoot: Field,
@@ -274,7 +272,7 @@ export class ClaimVotingContract extends SmartContract {
   ) {
     const claimUid = this.claimUid.get();
     this.claimUid.assertEquals(claimUid);
-    Circuit.log("dispatchVote for claimUid=", claimUid);
+    // Circuit.log("dispatchVote for claimUid=", claimUid);
     
     // check if this elector has already voted in the claimUid
     this.assertHasNotVoted(
@@ -291,12 +289,12 @@ export class ClaimVotingContract extends SmartContract {
     // dispatch action
     const action: VoteAction = { 
       isValid: Bool(true),
-      positive: Circuit.if(vote.greaterThan(0), Bool(true), Bool(false)),
-      negative: Circuit.if(vote.lessThan(0), Bool(true), Bool(false)),
-      ignore: Circuit.if(vote.equals(0), Bool(true), Bool(false))
+      positive: Circuit.if(vote.equals(VoteValue.POSITIVE), Bool(true), Bool(false)),
+      negative: Circuit.if(vote.equals(VoteValue.NEGATIVE), Bool(true), Bool(false)),
+      ignore: Circuit.if(vote.equals(VoteValue.ABSTAIN), Bool(true), Bool(false))
     };
     this.reducer.dispatch(action);  
-    Circuit.log("dispatched action", action);
+    // Circuit.log("dispatched action", action);
 
     // send event to change this elector state in Nullifier
     this.emitEvent("elector-has-voted", {
@@ -312,122 +310,4 @@ export class ClaimVotingContract extends SmartContract {
     // zkApp.result.get() === REJECTED
     this.addVote(action);
   }
-
-
-//   @method rollupVotes() {
-//     const claimUid = this.claimUid.get();
-//     this.claimUid.assertEquals(claimUid);
-// 
-//     // check that this claim is still open (in the voting process)
-//     const currentResult = this.result.get();
-//     this.result.assertEquals(currentResult);
-//     currentResult.assertEquals(VOTING, /*ELSE*/"Voting has already finished !");
-// 
-//     // get current votes state
-//     let positives = this.positive.getAndAssertEquals();
-//     let negatives = this.negative.getAndAssertEquals();
-//     let ignored = this.ignored.getAndAssertEquals();
-//     let votes = Field(0).add(positives).add(negatives).add(ignored);
-// 
-//     // get current ending conditions
-//     let requiredVotes = this.requiredVotes.getAndAssertEquals();
-//     let requiredPositives = this.requiredPositives.getAndAssertEquals();
-//     
-//     // check that we have not already finished 
-//     // and that we can receive additional votes
-//     votes.assertLessThan(requiredVotes, "Too late, voting has already finished !");
-//     Circuit.log("rollupVotes votes required,total=", requiredVotes, votes);
-// 
-//     // get the point in history where we left the last rollup
-//     let actionsState = this.actionsState.get();
-//     this.actionsState.assertEquals(actionsState);
-//     Circuit.log("rollupVotes actionsState=", actionsState);
-//     
-//     // get all votes not counted since last rollup
-//     let pendingVotes = this.reducer.getActions({
-//       fromActionState: actionsState,
-//     });
-//     Circuit.log("rollupVotes pendingVotes.length=", pendingVotes.length);
-// 
-//     // build Voting initial state for Reducer
-//     let votingState: Votes = {
-//       total: votes,
-//       positive: positives,
-//       negative: negatives,
-//       ignored: ignored,
-//     };
-// 
-//     let { 
-//       state: newVotes, 
-//       actionState: newActionsState 
-//     } = this.reducer.reduce(
-//       pendingVotes, // pending votes to reduce
-//       Votes,        // the state type
-//       function (    // function that says how to apply the action
-//         state: Votes, 
-//         action: VoteAction
-//       ) {
-//         // we can use a reducer here because it is not important if votes arrive 
-//         // in different order than the one they were emited. we just need more
-//         // than the total required votes to be done
-//         Circuit.log("---");
-//         Circuit.log("reducer action=", action);
-//         Circuit.log("reducer before state=", state);
-//         const notFinished = state.total.lessThan(requiredVotes);
-//         const mustCount = notFinished.and(action.isValid);
-//         Circuit.log("reducer notFinished=", notFinished, "isValid=", action.isValid, " mustCount=", mustCount);
-//         state.total = Circuit.if(mustCount, state.total.add(1), state.total);
-//         state.positive = Circuit.if(mustCount.and(action.positive), state.positive.add(1), state.positive);
-//         state.negative = Circuit.if(mustCount.and(action.negative), state.negative.add(1), state.negative);
-//         state.ignored = Circuit.if(mustCount.and(action.ignore), state.ignored.add(1), state.ignored);
-//         Circuit.log("reducer after state=", state);
-//         return state;
-//       },
-//       { state: votingState, actionState: actionsState } // initial state and actions point
-//     );
-//     Circuit.log("reducer final state=", newVotes);
-// 
-//     // update on-chain voting and actions state
-//     this.actionsState.set(newActionsState);
-//     this.positive.set(newVotes.positive);
-//     this.negative.set(newVotes.negative);
-//     this.ignored.set(newVotes.ignored);
-// 
-//     // check if we have met end voting conditions
-//     let isFinished = newVotes.total.greaterThanOrEqual(requiredVotes);
-//     let isApproved = newVotes.positive.greaterThanOrEqual(requiredPositives);
-//          
-//     // assert result before changing its value
-//     let result = this.result.get();
-//     this.result.assertEquals(result);
-// 
-//     // now evaluate final result
-//     let newResult = Circuit.if(isFinished, 
-//       Circuit.if(isApproved, APPROVED, REJECTED),
-//       result
-//     );
-// 
-//     // update final on-chain result state
-//     this.result.set(newResult);
-// 
-//     // check if it has changed so we can report it with the event
-//     let resultHasChanged = newResult.greaterThan(result);
-// 
-//     // and send event with actual result, even if it is not yet finished
-//     // TODO: can we use an if condition here? I think it cant be done
-//     this.emitEvent("voting-changed", {
-//       claimUid: claimUid,
-//       isFinished: isFinished,
-//       hasChanged: resultHasChanged,
-//       result: result,
-//       total: newVotes.total,
-//       positive: newVotes.positive,
-//       negative: newVotes.negative,
-//       ignored: newVotes.ignored
-//     });
-// 
-//     Circuit.log("rollupClaims result=", newResult);
-//     Circuit.log("rollupClaims isFinished=", isFinished);
-//     Circuit.log("rollupClaims isApproved=", isApproved);
-//   }
 }
