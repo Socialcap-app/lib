@@ -1,5 +1,6 @@
 import { PublicKey, Field, Struct, Poseidon, MerkleMap, MerkleMapWitness } from "o1js";
 import { sliced } from "./long-string.js";
+import { DEBUG_LOG } from "./logs.js";
 
 export {
   ElectorInClaimLeaf,
@@ -81,11 +82,13 @@ class ElectorsInClaimNullifier {
 
 
 const logLeaf = (mp: MerkleMap, key: Field) => {
+  if (! DEBUG_LOG) return;
   console.log(`ElectorsinClaimNullifier addElectors()`
     +` root=${sliced(mp.getRoot().toString())}  key=${sliced(key.toString())}`);
 }
 
 const logWitness = (root: Field, key: Field) => {
+  if (! DEBUG_LOG) return;
   console.log(`ElectorsinClaimNullifier addElectors()`
     +` witnessRoot=${sliced(root.toString())} witnessKey=${sliced(key.toString())}`);
 }

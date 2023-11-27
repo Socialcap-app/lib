@@ -1,5 +1,6 @@
 import { PublicKey, Field, Struct, Poseidon, MerkleTree, MerkleWitness} from "o1js";
 import { sliced } from "./long-string.js";
+import { DEBUG_LOG } from "./logs.js";
 
 export {
   NullifierMTWitness,
@@ -79,11 +80,13 @@ class NullifierMT {
 
 
 const logLeaf = (mt: MerkleTree, index: bigint, value: Field) => {
+  if (! DEBUG_LOG) return;
   console.log(`NullifierMT addLeafs()`
     +` root=${sliced(mt.getRoot().toString())} index=${index} witnessValue=${sliced(value.toString())}`);
 }
 
 const logWitness = (root: Field, index: bigint, value: Field) => {
+  if (! DEBUG_LOG) return;
   console.log(`NullifierMT addLeafs()`
     +` witnessRoot=${sliced(root.toString())} index=${index} witnessValue=${sliced(value.toString())}`);
 }
@@ -92,5 +95,5 @@ const logAssert = (root: Field, witnessRoot: Field, asserted: boolean) => {
   console.log(`NullifierMT assert()`
     +` root=${sliced(root.toString())}`
     +` witnessRoot=${sliced(witnessRoot.toString())}`
-    +` asserted=${asserted}`);
+    +` ${asserted ? 'ASSERTED' : 'FAILED'}`);
 }
