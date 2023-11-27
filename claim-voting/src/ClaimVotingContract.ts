@@ -175,14 +175,16 @@ export class ClaimVotingContract extends SmartContract {
     batchRoot: Field,
     batchWitness: VotesInBatchWitness
   ) {
-    let leafValue = VoteInBatchLeaf.value(electorPuk, claimUid, vote);
+    let leafValue = VoteInBatchLeaf.value({
+      electorPuk: electorPuk, claimUid: claimUid, result: vote
+    });
     let recalculatedRoot = batchWitness.calculateRoot(leafValue);
     recalculatedRoot.assertEquals(batchRoot);  
   }
 
 
   /**
-   * We count votes any time a new vote is received. In this way 
+   * We count votes every time a new vote is received. In this way 
    * we do not need a reducer to evaluate the final result.
    */
   @method addVote(action: VoteAction) {
@@ -274,7 +276,6 @@ export class ClaimVotingContract extends SmartContract {
     this.claimUid.assertEquals(claimUid);
     Circuit.log("dispatchVote for claimUid=", claimUid);
     
-/*
     // check if this elector has already voted in the claimUid
     this.assertHasNotVoted(
       electorPuk, claimUid, 
@@ -286,6 +287,7 @@ export class ClaimVotingContract extends SmartContract {
       electorPuk, claimUid, vote,
       batchRoot, batchWitness
     );
+
     // dispatch action
     const action: VoteAction = { 
       isValid: Bool(true),
@@ -309,7 +311,6 @@ export class ClaimVotingContract extends SmartContract {
     // zkApp.result.get() === APPROVED
     // zkApp.result.get() === REJECTED
     this.addVote(action);
-*/    
   }
 
 

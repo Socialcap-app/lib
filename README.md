@@ -17,10 +17,19 @@ The corresponding `npm` packages are:
 - @socialcap/batch-voting-contracts
 - @socialcap/claim-voting-contracts
 - @socialcap/collection-contracts
-- @socialcap/models
-- @socialcap/lib
+- @socialcap/contracts-models
+- @socialcap/contracts-lib
+
+### To do
+
+- 
 
 ### Changelog
 
+2023-11-27 
+- ClaimVotingContract now reduces on each vote, tested
+- contracts-lib 0.1.5 implements generic nullifier MT, tested
+
+2023-11-25 
 - updated to o1js 0.14.2
-- refactored into different folders
+- refactored socialcap contracts into different folders

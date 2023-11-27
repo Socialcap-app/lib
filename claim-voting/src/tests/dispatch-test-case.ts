@@ -1,9 +1,13 @@
-import { Mina, PrivateKey, PublicKey, Field, MerkleMapWitness, MerkleMap, Poseidon } from 'o1js';
+import { Mina, PrivateKey, PublicKey, Field, MerkleMapWitness } from 'o1js';
 import { ClaimVotingContract } from '../ClaimVotingContract.js';
-import { VotesInBatchWitness } from '../../../lib/build/src/index.js';
+import { 
+  ElectorsInClaimNullifier, 
+  VotesInBatchNullifier, 
+  VotesInBatchWitness 
+} from '@socialcap/contracts-lib';
 
 
-export async function dispatchTheVote(
+async function dispatchTheVote(
   zkClaim: ClaimVotingContract,
   sender: {puk: PublicKey, prk: PrivateKey}, // sender and voter MUST be the same!
   vote: Field, // +1 positive, -1 negative or 0 ignored
@@ -53,3 +57,26 @@ export async function dispatchTheVote(
 }
 
 
+export async function dispatchTestCase(
+  zkClaim: ClaimVotingContract,
+  claimUid: Field,
+  testCase: { batches: any[], nullis: VotesInBatchNullifier[] },
+  electors: { puk: PublicKey, prk: PrivateKey }[],
+  electorsInClaim: ElectorsInClaimNullifier
+) {
+  for (let j=0; j < testCase.batches.length; j++) {
+    let votes = testCase.batches[j];
+    let nulli = testCase.nullis[j];
+  
+    // now we dispatch the votes for this claim in each batch
+    await dispatchTheVote(
+      zkClaim, 
+      electors[j],
+      votes[0].result, // first batch
+      nulli.root(),
+      nulli.witness(0n),
+      electorsInClaim.root(),
+      electorsInClaim.witness(electors[j].puk, claimUid)
+    );
+  }
+}
