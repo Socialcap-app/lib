@@ -3,8 +3,8 @@ import { ClaimVotingContract } from "./ClaimVotingContract.js";
 import { checkTransaction } from "./tests/test-helpers.js";
 
 export { 
-  compileVotingContract,
-  deployVotingContract,
+  compileClaimVotingContract,
+  deployClaimVotingContract,
   ClaimVotingInstance 
 };
 
@@ -21,19 +21,19 @@ type ClaimVotingInstance = {
 const DEPLOY_TX_FEE = 300_000_000;
 
 
-async function compileVotingContract(proofsEnabled?: boolean) {
+async function compileClaimVotingContract(proofsEnabled?: boolean) {
   // compile Contract
   proofsEnabled = proofsEnabled === undefined ? true : proofsEnabled;
-  console.log("proofs enabled=", proofsEnabled);
-  console.log("compiling Contract ...");
+  //console.log("proofs enabled=", proofsEnabled);
+  //console.log("compiling Contract ...");
   if (proofsEnabled) 
     await ClaimVotingContract.compile();
-  console.log("compiled !");
+  //console.log("compiled !");
   isCompiled = true;
 }
 
 
-async function deployVotingContract(params: {
+async function deployClaimVotingContract(params: {
   claimUid: Field,
   requiredVotes: Field,
   requiredPositives: Field,
@@ -50,16 +50,16 @@ async function deployVotingContract(params: {
     isLocal
   } = params;
 
-  // we ALWAYS compile it
-  await ClaimVotingContract.compile();
+  // we need to compile it just once
+  if (!isCompiled) await compileClaimVotingContract(proofsEnabled);
 
   // we need to generate a new key pair for each deploy
   const zkAppKey = PrivateKey.random();
   const zkAppAddr = zkAppKey.toPublicKey();
-  console.log(`\nzkApp instance address=${zkAppAddr.toBase58()}`);
+  //console.log(`\nzkApp instance address=${zkAppAddr.toBase58()}`);
 
   let zkApp = new ClaimVotingContract(zkAppAddr);
-  console.log("zkApp instance created!");
+  //console.log("zkApp instance created!");
   
   // deploy it 
   let txn = await Mina.transaction(
@@ -68,6 +68,9 @@ async function deployVotingContract(params: {
     // or this will fail miserably ughhh
     AccountUpdate.fundNewAccount(deployerAccount);
     zkApp.deploy();
+    zkApp.claimUid.set(claimUid);
+    zkApp.requiredVotes.set(requiredVotes);
+    zkApp.requiredPositives.set(requiredPositives);
   });
   await txn.prove();
 
@@ -75,7 +78,7 @@ async function deployVotingContract(params: {
   // that requires signature authorization
   txn.sign([deployerKey, zkAppKey]);
   let pendingTx = await txn.send();
-  console.log("zkApp instance deployed !")
+  //console.log("zkApp instance deployed !")
   
   checkTransaction(pendingTx);
 
@@ -89,70 +92,44 @@ async function deployVotingContract(params: {
       eachTimeNotExist: () => {
         let ts = (new Date()).toISOString();
         counter = counter+5; // every 5 secs
-        console.log(`${ts} ${counter} ... waiting for zkApp account to be fully available ...`);
+        //console.log(`${ts} ${counter} ... waiting for zkApp account to be fully available ...`);
       },
       isZkAppAccount: true,
     });
   }
 
+  // DEPRECTATED -- DON'T NEED THIS ANYMORE 
+  // now we initialize the contract values on the deploy transaction itself
   // initialize it !
   // we can only call setup() AFTER we are sure the deployed account exists
   // otherwise we have failures when initializing ...
-  console.log(`\nInitializing instance for claim='${claimUid.toString()}'`);
-  console.log(`...requiredVotes='${requiredVotes}'`);
-  console.log(`...requiredPositives='${requiredPositives}'`);
-  txn = await Mina.transaction(
-    { sender:deployerAccount, fee: DEPLOY_TX_FEE }, () => {
-    zkApp.setup(claimUid, requiredVotes, requiredPositives);
-  });
-  await txn.prove();
-  let pndTx2 = await txn.sign([deployerKey]).send();
-  console.log("zkApp instance initialized !")
-
-  checkTransaction(pndTx2);
+  //   console.log(`\nInitializing instance for claim='${claimUid.toString()}'`);
+  //   console.log(`...requiredVotes='${requiredVotes}'`);
+  //   console.log(`...requiredPositives='${requiredPositives}'`);
+  //   txn = await Mina.transaction(
+  //     { sender:deployerAccount, fee: DEPLOY_TX_FEE }, () => {
+  //     zkApp.setup(claimUid, requiredVotes, requiredPositives);
+  //   });
+  //   await txn.prove();
+  //   let pndTx2 = await txn.sign([deployerKey]).send();
+  //   console.log("zkApp instance initialized !")
+  // 
+  //   checkTransaction(pndTx2);
 
   // get some value after deploy
   let actionsState = zkApp.actionsState.get(); 
-  console.log("zkApp instance actionsState=", actionsState.toString())
+  //console.log("zkApp instance actionsState=", actionsState.toString())
 
   const instance: ClaimVotingInstance = {
     instance: zkApp, 
     address: zkAppAddr, 
     secret: zkAppKey,
-    txn: pndTx2.hash() 
+    txn: pendingTx.hash() 
   };
 
   logIt(instance);
   return instance;
 }
-
-
-async function getVotingInstance(
-  publicKey: PublicKey
-): Promise<ClaimVotingInstance> {
-  // we need to create an instance of an already deployed contract
-  console.log(`\nzkApp instance address=${publicKey.toBase58()}`);
-
-  let response = await fetchAccount({ publicKey: publicKey });
-  console.log("zkApp account exists ?", response);
-  console.log("zkApp status=", response.account?.zkapp?.appState);
-
-  let zkApp = new ClaimVotingContract(publicKey);
-  console.log("zkApp instance created!");
-  
-  // get some value after creating just for checking
-  let actionsState = zkApp.actionsState.get(); 
-  console.log("zkApp instance actionsState=", actionsState.toString())
-
-  const instance: ClaimVotingInstance = {
-    instance: zkApp, 
-    address: publicKey
-  };
-
-  logIt(instance);
-  return instance;
-}
-
 
 function logIt(zkapp: any) {
   console.log(
