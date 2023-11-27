@@ -1,6 +1,6 @@
 import { PrivateKey, PublicKey, Mina, Field, AccountUpdate, fetchAccount } from "o1js";
 import { ClaimVotingContract } from "./ClaimVotingContract.js";
-import { checkTransaction } from "./tests/test-helpers.js";
+import { checkTransaction } from "./tests/helpers.js";
 
 export { 
   compileClaimVotingContract,
@@ -133,9 +133,10 @@ async function deployClaimVotingContract(params: {
 
 function logIt(zkapp: any) {
   console.log(
-    `instance= ${JSON.stringify(zkapp.instance.account, null, 2)}`
-    +`\naddress= ${zkapp.address.toBase58()}`
-    +`\nsecret= ${zkapp?.secret?.toBase58() || ''}`  
+    `\nClaimVoting zkApp deployed`//instance= ${JSON.stringify(zkapp.instance.account, null, 2)}`
+    +` address= ${zkapp.address.toBase58()}`
+    +` secret= ${zkapp?.secret?.toBase58() || ''}`
+    +`\n`  
   );
 }
 
