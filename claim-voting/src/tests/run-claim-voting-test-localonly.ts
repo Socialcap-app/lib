@@ -1,14 +1,13 @@
 import { Mina, PrivateKey, PublicKey, Field } from 'o1js';
-import { ClaimVotingInstance, deployVotingContract, compileVotingContract } from "../claims-voting-factory.js";
-import { ElectorsInClaimNullifier, VotesInBatchNullifier } from '@socialcap/contracts-lib';
+import { ClaimVotingInstance, deployClaimVotingContract } from "../claims-voting-factory.js";
+import { ElectorsInClaimNullifier } from '@socialcap/contracts-lib';
 import { dispatchTestCase } from './dispatch-test-case.js';
+import { APPROVED, REJECTED, VOTING } from '../ClaimVotingContract.js';
 import { 
   caseAllPositives, 
   caseAllNegatives,
   caseNotEnoughVotes,
   caseNotEnoughPositives, 
-  //caseNotEnoughVotes,
-  //caseNotEnoughPositives
 } from './all-test-cases.js';
 
 // set instance
@@ -29,10 +28,45 @@ let sender = getLocalAccount(1);
 console.log("deployer Addr=", deployer.puk.toBase58());
 console.log("sender Addr=", sender.puk.toBase58());
 
-// first compile it
-await compileVotingContract();
-
 let claimUid = Field(1001); // the first Claim
+
+//// deploy 4 instances, one for each test case ////
+let zkClaim1: ClaimVotingInstance = await deployClaimVotingContract({
+  claimUid: claimUid, // claimUid (simulated)
+  requiredVotes: Field(3), // 3 total votes required
+  requiredPositives: Field(2),  // 2 positives is approved
+  deployerAccount: deployer.puk, 
+  deployerKey: deployer.prk,
+  isLocal: true 
+});
+
+let zkClaim2: ClaimVotingInstance = await deployClaimVotingContract({
+  claimUid: claimUid, // claimUid (simulated)
+  requiredVotes: Field(3), // 3 total votes required
+  requiredPositives: Field(2),  // 2 positives is approved
+  deployerAccount: deployer.puk, 
+  deployerKey: deployer.prk,
+  isLocal: true 
+});
+
+let zkClaim3: ClaimVotingInstance = await deployClaimVotingContract({
+  claimUid: claimUid, // claimUid (simulated)
+  requiredVotes: Field(3), // 3 total votes required
+  requiredPositives: Field(2),  // 2 positives is approved
+  deployerAccount: deployer.puk, 
+  deployerKey: deployer.prk,
+  isLocal: true 
+});
+
+let zkClaim4: ClaimVotingInstance = await deployClaimVotingContract({
+  claimUid: claimUid, // claimUid (simulated)
+  requiredVotes: Field(3), // 3 total votes required
+  requiredPositives: Field(2),  // 2 positives is approved
+  deployerAccount: deployer.puk, 
+  deployerKey: deployer.prk,
+  isLocal: true 
+});
+
 
 //// we need to get some electors with their accountIds ////
 
@@ -59,18 +93,8 @@ let electorPuks = electors.map((t) => t.puk); // as an array of Pubkeys
 
 console.log("\n\n///////////////////////////////////////////////////////////////////");
 console.log("\nAll 3 votes are positive => FINISHED & APPROVED");
-
-let zkClaim1: ClaimVotingInstance = await deployVotingContract({
-  claimUid: claimUid, // claimUid (simulated)
-  requiredVotes: Field(3), // 3 total votes required
-  requiredPositives: Field(2),  // 2 positives is approved
-  deployerAccount: deployer.puk, 
-  deployerKey: deployer.prk,
-  isLocal: true 
-});
-
 let case1 = caseAllPositives(electorPuks);
-await dispatchTestCase(
+let result1 = await dispatchTestCase(
   zkClaim1.instance,
   claimUid,
   case1,
@@ -80,18 +104,8 @@ await dispatchTestCase(
 
 console.log("\n\n///////////////////////////////////////////////////////////////////");
 console.log("\nAll 3 votes are negative  => FINISHED & REJECTED");
-
-let zkClaim2: ClaimVotingInstance = await deployVotingContract({
-  claimUid: claimUid, // claimUid (simulated)
-  requiredVotes: Field(3), // 3 total votes required
-  requiredPositives: Field(2),  // 2 positives is approved
-  deployerAccount: deployer.puk, 
-  deployerKey: deployer.prk,
-  isLocal: true 
-});
-
 let case2 = caseAllNegatives(electorPuks);
-await dispatchTestCase(
+let result2 = await dispatchTestCase(
   zkClaim2.instance,
   claimUid,
   case2,
@@ -99,21 +113,10 @@ await dispatchTestCase(
   electorsInClaim
 )
 
-
 console.log("\n\n///////////////////////////////////////////////////////////////////");
 console.log("\nOnly 2 total votes, and 2 positives  => NOT FINISHED")
-
-let zkClaim3: ClaimVotingInstance = await deployVotingContract({
-  claimUid: claimUid, // claimUid (simulated)
-  requiredVotes: Field(3), // 3 total votes required
-  requiredPositives: Field(2),  // 2 positives is approved
-  deployerAccount: deployer.puk, 
-  deployerKey: deployer.prk,
-  isLocal: true 
-});
-
 let case3 = caseNotEnoughVotes(electorPuks);
-await dispatchTestCase(
+let result3 = await dispatchTestCase(
   zkClaim3.instance,
   claimUid,
   case3,
@@ -123,21 +126,20 @@ await dispatchTestCase(
 
 console.log("\n\n///////////////////////////////////////////////////////////////////");
 console.log("\nOnly 1 positive vote, total votes is 3 => FINISHED & REJECTED");
-
-let zkClaim4: ClaimVotingInstance = await deployVotingContract({
-  claimUid: claimUid, // claimUid (simulated)
-  requiredVotes: Field(3), // 3 total votes required
-  requiredPositives: Field(2),  // 2 positives is approved
-  deployerAccount: deployer.puk, 
-  deployerKey: deployer.prk,
-  isLocal: true 
-});
-
 let case4 = caseNotEnoughPositives(electorPuks);
-await dispatchTestCase(
+let result4 = await dispatchTestCase(
   zkClaim4.instance,
   claimUid,
   case4,
   electors,
   electorsInClaim
 )
+
+console.log("\n\n///////////////////////////////////////////////////////////////////");
+console.log("\n\nFinal results");
+console.log(`
+  Case 1 (3 positives / 3 total): Expected= ${APPROVED} , Result: ${result1} ${result1.equals(APPROVED) ? 'PASSED' : 'FAILED'}
+  Case 2 (3 negatives / 3 total): Expected= ${REJECTED} , Result: ${result2} ${result2.equals(REJECTED) ? 'PASSED' : 'FAILED'}
+  Case 3 (2 positives / 2 total): Expected= ${VOTING} , Result: ${result3} ${result3.equals(VOTING) ? 'PASSED' : 'FAILED'}
+  Case 4 (1 positive  / 3 total): Expected= ${REJECTED} , Result: ${result4} ${result4.equals(REJECTED) ? 'PASSED' : 'FAILED'}
+`)

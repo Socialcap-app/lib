@@ -1,5 +1,6 @@
 import { Field, PublicKey } from 'o1js';
 import { VotesInBatchNullifier } from '@socialcap/contracts-lib';
+import { VoteValue } from '../ClaimVotingContract.js';
 
 /*
   Condition for APPROVAL is required = 3, positives = 2
@@ -11,23 +12,23 @@ export function caseAllPositives(electors: PublicKey[]): {
   nullis: VotesInBatchNullifier[]
 } {
   const votes0 = [
-    { electorPuk: electors[0], claimUid:  Field(1001), result: Field(+1)},
-    { electorPuk: electors[0], claimUid:  Field(1002), result: Field(+1)},
-    { electorPuk: electors[0], claimUid:  Field(1003), result: Field(+1)}
+    { electorPuk: electors[0], claimUid:  Field(1001), result: VoteValue.POSITIVE},
+    { electorPuk: electors[0], claimUid:  Field(1002), result: VoteValue.POSITIVE},
+    { electorPuk: electors[0], claimUid:  Field(1003), result: VoteValue.POSITIVE}
   ]
   const votesInBatch0 = (new VotesInBatchNullifier()).addLeafs(votes0);
   
   const votes1 = [
-    { electorPuk: electors[1], claimUid:  Field(1001), result: Field(+1)},
-    { electorPuk: electors[1], claimUid:  Field(1002), result: Field(+1)},
-    { electorPuk: electors[1], claimUid:  Field(1003), result: Field(+1)}
+    { electorPuk: electors[1], claimUid:  Field(1001), result: VoteValue.POSITIVE},
+    { electorPuk: electors[1], claimUid:  Field(1002), result: VoteValue.POSITIVE},
+    { electorPuk: electors[1], claimUid:  Field(1003), result: VoteValue.POSITIVE}
   ]
   const votesInBatch1 = (new VotesInBatchNullifier()).addLeafs(votes1);
   
   const votes2 = [
-    { electorPuk: electors[2], claimUid:  Field(1001), result: Field(+1)},
-    { electorPuk: electors[2], claimUid:  Field(1002), result: Field(+1)},
-    { electorPuk: electors[2], claimUid:  Field(1003), result: Field(+1)}
+    { electorPuk: electors[2], claimUid:  Field(1001), result: VoteValue.POSITIVE},
+    { electorPuk: electors[2], claimUid:  Field(1002), result: VoteValue.POSITIVE},
+    { electorPuk: electors[2], claimUid:  Field(1003), result: VoteValue.POSITIVE}
   ]
   const votesInBatch2 = (new VotesInBatchNullifier()).addLeafs(votes2);
 
@@ -43,23 +44,23 @@ export function caseAllNegatives(electors: PublicKey[]): {
   nullis: VotesInBatchNullifier[]
 } {
   const votes0 = [
-    { electorPuk: electors[0], claimUid:  Field(1001), result: Field(-1)},
-    { electorPuk: electors[0], claimUid:  Field(1002), result: Field(+1)},
-    { electorPuk: electors[0], claimUid:  Field(1003), result: Field(+1)}
+    { electorPuk: electors[0], claimUid:  Field(1001), result: VoteValue.NEGATIVE},
+    { electorPuk: electors[0], claimUid:  Field(1002), result: VoteValue.POSITIVE},
+    { electorPuk: electors[0], claimUid:  Field(1003), result: VoteValue.POSITIVE}
   ]
   const votesInBatch0 = (new VotesInBatchNullifier()).addLeafs(votes0);
   
   const votes1 = [
-    { electorPuk: electors[1], claimUid:  Field(1001), result: Field(-1)},
-    { electorPuk: electors[1], claimUid:  Field(1002), result: Field(+1)},
-    { electorPuk: electors[1], claimUid:  Field(1003), result: Field(+1)}
+    { electorPuk: electors[1], claimUid:  Field(1001), result: VoteValue.NEGATIVE},
+    { electorPuk: electors[1], claimUid:  Field(1002), result: VoteValue.POSITIVE},
+    { electorPuk: electors[1], claimUid:  Field(1003), result: VoteValue.POSITIVE}
   ]
   const votesInBatch1 = (new VotesInBatchNullifier()).addLeafs(votes1);
   
   const votes2 = [
-    { electorPuk: electors[2], claimUid:  Field(1001), result: Field(-1)},
-    { electorPuk: electors[2], claimUid:  Field(1002), result: Field(+1)},
-    { electorPuk: electors[2], claimUid:  Field(1003), result: Field(+1)}
+    { electorPuk: electors[2], claimUid:  Field(1001), result: VoteValue.NEGATIVE},
+    { electorPuk: electors[2], claimUid:  Field(1002), result: VoteValue.POSITIVE},
+    { electorPuk: electors[2], claimUid:  Field(1003), result: VoteValue.POSITIVE}
   ]
   const votesInBatch2 = (new VotesInBatchNullifier()).addLeafs(votes2);
 
@@ -75,16 +76,16 @@ export function caseNotEnoughVotes(electors: PublicKey[]): {
   nullis: VotesInBatchNullifier[]
 } {
   const votes0 = [
-    { electorPuk: electors[0], claimUid:  Field(1001), result: Field(+1)},
-    { electorPuk: electors[0], claimUid:  Field(1002), result: Field(+1)},
-    { electorPuk: electors[0], claimUid:  Field(1003), result: Field(+1)}
+    { electorPuk: electors[0], claimUid:  Field(1001), result: VoteValue.POSITIVE},
+    { electorPuk: electors[0], claimUid:  Field(1002), result: VoteValue.POSITIVE},
+    { electorPuk: electors[0], claimUid:  Field(1003), result: VoteValue.POSITIVE}
   ]
   const votesInBatch0 = (new VotesInBatchNullifier()).addLeafs(votes0);
   
   const votes1 = [
-    { electorPuk: electors[1], claimUid:  Field(1001), result: Field(+1)},
-    { electorPuk: electors[1], claimUid:  Field(1002), result: Field(+1)},
-    { electorPuk: electors[1], claimUid:  Field(1003), result: Field(+1)}
+    { electorPuk: electors[1], claimUid:  Field(1001), result: VoteValue.POSITIVE},
+    { electorPuk: electors[1], claimUid:  Field(1002), result: VoteValue.POSITIVE},
+    { electorPuk: electors[1], claimUid:  Field(1003), result: VoteValue.POSITIVE}
   ]
   const votesInBatch1 = (new VotesInBatchNullifier()).addLeafs(votes1);
   
@@ -101,23 +102,23 @@ export function caseNotEnoughPositives(electors: PublicKey[]): {
   nullis: VotesInBatchNullifier[]
 } {
   const votes0 = [
-    { electorPuk: electors[0], claimUid:  Field(1001), result: Field(+1)},
-    { electorPuk: electors[0], claimUid:  Field(1002), result: Field(+1)},
-    { electorPuk: electors[0], claimUid:  Field(1003), result: Field(+1)}
+    { electorPuk: electors[0], claimUid:  Field(1001), result: VoteValue.POSITIVE},
+    { electorPuk: electors[0], claimUid:  Field(1002), result: VoteValue.POSITIVE},
+    { electorPuk: electors[0], claimUid:  Field(1003), result: VoteValue.POSITIVE}
   ]
   const votesInBatch0 = (new VotesInBatchNullifier()).addLeafs(votes0);
   
   const votes1 = [
-    { electorPuk: electors[1], claimUid:  Field(1001), result: Field(0)},
-    { electorPuk: electors[1], claimUid:  Field(1002), result: Field(+1)},
-    { electorPuk: electors[1], claimUid:  Field(1003), result: Field(+1)}
+    { electorPuk: electors[1], claimUid:  Field(1001), result: VoteValue.ABSTAIN},
+    { electorPuk: electors[1], claimUid:  Field(1002), result: VoteValue.POSITIVE},
+    { electorPuk: electors[1], claimUid:  Field(1003), result: VoteValue.POSITIVE}
   ]
   const votesInBatch1 = (new VotesInBatchNullifier()).addLeafs(votes1);
   
   const votes2 = [
-    { electorPuk: electors[2], claimUid:  Field(1001), result: Field(0)},
-    { electorPuk: electors[2], claimUid:  Field(1002), result: Field(+1)},
-    { electorPuk: electors[2], claimUid:  Field(1003), result: Field(+1)}
+    { electorPuk: electors[2], claimUid:  Field(1001), result: VoteValue.ABSTAIN},
+    { electorPuk: electors[2], claimUid:  Field(1002), result: VoteValue.POSITIVE},
+    { electorPuk: electors[2], claimUid:  Field(1003), result: VoteValue.POSITIVE}
   ]
   const votesInBatch2 = (new VotesInBatchNullifier()).addLeafs(votes2);
 

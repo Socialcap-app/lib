@@ -19,7 +19,7 @@ async function dispatchTheVote(
   // send the Vote Now
   const VOTING_TX_FEE = 300_000_000;
   const senderAndFee = { sender: sender.puk, fee: VOTING_TX_FEE };
-  console.log("\ndispatchVote from=", sender.puk.toBase58())  
+  console.log(`\ndispatchVote claim=${zkClaim.claimUid.get()} vote=${vote} payer=${sender.puk.toBase58()}`);  
 
   try {
     let tx = await Mina.transaction(senderAndFee, () => { 
@@ -42,6 +42,7 @@ async function dispatchTheVote(
       // process.exit(0); // we will NOT exit here, but retry latter !!!
       // break; 
     }
+    
     console.log(
       `See transaction at https://berkeley.minaexplorer.com/transaction/${pendingTx.hash()}
       Waiting for transaction to be included...`
@@ -79,4 +80,7 @@ export async function dispatchTestCase(
       electorsInClaim.witness(electors[j].puk, claimUid)
     );
   }
+
+  let result = zkClaim.result.get();
+  return result;
 }
