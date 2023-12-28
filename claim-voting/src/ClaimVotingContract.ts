@@ -23,18 +23,11 @@ import { VoteInBatchLeaf, VotesInBatchWitness  } from "@socialcap/contracts-lib"
 import { ElectorInClaimLeaf } from "@socialcap/contracts-lib";
 
 
-export class VoteValue extends Struct({}) {
+export class VoteValue {
   static POSITIVE = Field(1);
-  static NEGATIVE = Field(2); // using -1 creates problems :-)
+  static NEGATIVE = Field(-1); 
   static ABSTAIN = Field(0);
 }
-
-class Votes extends Struct({
-  total: Field,
-  positive: Field,
-  negative: Field,
-  ignored: Field
-}){}
 
 class VoteAction extends Struct({
   isValid: Bool,
@@ -188,7 +181,7 @@ export class ClaimVotingContract extends SmartContract {
    * We count votes every time a new vote is received. In this way 
    * we do not need a reducer to evaluate the final result.
    */
-  @method addVote(action: VoteAction) {
+  @method sumVotes(action: VoteAction) {
     // we need this latter ...
     const claimUid = this.claimUid.get();
     this.claimUid.assertEquals(claimUid);
@@ -308,6 +301,6 @@ export class ClaimVotingContract extends SmartContract {
     // zkApp.result.get() === VOTING still voting
     // zkApp.result.get() === APPROVED
     // zkApp.result.get() === REJECTED
-    this.addVote(action);
+    this.sumVotes(action);
   }
 }
