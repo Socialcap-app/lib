@@ -2,19 +2,30 @@ import { UID } from "./uid.js";
 import { UTCDateTime } from "./datetime.js";
 import { hashData } from "./evidence.js";
 import { sliced } from "./long-string.js";
+
 import {
   NullifierMT,
   NullifierMTWitness
 } from "./generic-nullifier-mt.js";
+
 import {
   ElectorInClaimLeaf,
   ElectorsInClaimNullifier
 } from "./electors-in-claim-nullifier.js";
+
 import {
   VoteInBatchLeaf,
   VotesInBatchNullifier,
   VotesInBatchWitness
 } from "./votes-in-batch-nullifier.js";
+
+import {
+  ALL_STATES, COMMUNITY_STATES, CLAIM_STATES, PERSON_STATES, 
+  ELECTOR_STATES, PLAN_STATES, TASK_STATES,
+  NONE, DRAFT, CANCELED, REVISION, CLAIMED, VOTING,  
+  ASSIGNED, ACTIVE, WAITING, DONE, IGNORED, UNPAID,
+  REJECTED, APPROVED
+} from "./all-states.js";
 
 export {
   UID,
@@ -27,5 +38,17 @@ export {
   ElectorsInClaimNullifier,
   VoteInBatchLeaf,
   VotesInBatchNullifier,
-  VotesInBatchWitness
+  VotesInBatchWitness,
+
+  // states
+  ALL_STATES,
+  COMMUNITY_STATES,
+  CLAIM_STATES,
+  PERSON_STATES,
+  ELECTOR_STATES,
+  PLAN_STATES,
+  TASK_STATES,
+  NONE, DRAFT, CANCELED, REVISION, CLAIMED, VOTING,  
+  ASSIGNED, ACTIVE, WAITING, DONE, IGNORED, UNPAID,
+  REJECTED, APPROVED,
 };
