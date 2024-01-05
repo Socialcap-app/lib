@@ -15,9 +15,9 @@ import {
 
 import {
   VoteInBatchLeaf,
-  VotesInBatchNullifier,
+  VotesInBatchMT,
   VotesInBatchWitness
-} from "./votes-in-batch-nullifier.js";
+} from "./votes-in-batch-mt.js";
 
 import {
   ALL_STATES, COMMUNITY_STATES, CLAIM_STATES, PERSON_STATES, 
@@ -37,7 +37,7 @@ export {
   ElectorInClaimLeaf,
   ElectorsInClaimNullifier,
   VoteInBatchLeaf,
-  VotesInBatchNullifier,
+  VotesInBatchMT,
   VotesInBatchWitness,
 
   // states

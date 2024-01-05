@@ -1,6 +1,6 @@
 import { Mina, PrivateKey, PublicKey, Field } from 'o1js';
 import { ElectorsInClaimNullifier } from '../index.js';
-import { VoteInBatchLeaf, VotesInBatchNullifier, VotesInBatchWitness } from '../votes-in-batch-nullifier.js';
+import { VoteInBatchLeaf, VotesInBatchMT, VotesInBatchWitness } from '../votes-in-batch-mt.js';
 
 // set instance
 const Local = Mina.LocalBlockchain({ proofsEnabled: true });
@@ -46,7 +46,7 @@ const votes0 = [
   { electorPuk: electors[0].puk, claimUid:  Field(1002), result: Field(+1)},
   { electorPuk: electors[0].puk, claimUid:  Field(1003), result: Field(+1)}
 ]
-const votesInBatch0 = (new VotesInBatchNullifier()).addLeafs(votes0);
+const votesInBatch0 = (new VotesInBatchMT()).addLeafs(votes0);
 lastIndex = Number(votesInBatch0.lastIndex());
 lastValue = VoteInBatchLeaf.value(votes0[lastIndex])  
 votesInBatch0.assertLeaf(votesInBatch0.root(), BigInt(lastIndex), lastValue);
@@ -57,7 +57,7 @@ const votes1 = [
   { electorPuk: electors[1].puk, claimUid:  Field(1002), result: Field(+1)},
   { electorPuk: electors[1].puk, claimUid:  Field(1003), result: Field(+1)}
 ]
-const votesInBatch1 = (new VotesInBatchNullifier()).addLeafs(votes1);
+const votesInBatch1 = (new VotesInBatchMT()).addLeafs(votes1);
 lastIndex = Number(votesInBatch1.lastIndex());
 lastValue = VoteInBatchLeaf.value(votes1[lastIndex])  
 votesInBatch1.assertLeaf(votesInBatch1.root(), BigInt(lastIndex), lastValue);
@@ -68,7 +68,7 @@ const votes2 = [
   { electorPuk: electors[2].puk, claimUid:  Field(1002), result: Field(+1)},
   { electorPuk: electors[2].puk, claimUid:  Field(1003), result: Field(+1)}
 ]
-const votesInBatch2 = (new VotesInBatchNullifier()).addLeafs(votes2);
+const votesInBatch2 = (new VotesInBatchMT()).addLeafs(votes2);
 lastIndex = Number(votesInBatch2.lastIndex());
 lastValue = VoteInBatchLeaf.value(votes2[lastIndex])  
 votesInBatch2.assertLeaf(votesInBatch2.root(), BigInt(lastIndex), lastValue);

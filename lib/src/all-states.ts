@@ -31,8 +31,10 @@ export const
   DONE =  10,
   IGNORED = 11, // will not do this 
   UNPAID = 12, // payment transaction failed and needs repayment !
+  FAILED = 13, 
   REJECTED = 19,   
-  APPROVED = 20
+  APPROVED = 20,
+  UNKNOWN = 99
 ;
 
 const ALL_STATES = {
@@ -48,8 +50,10 @@ const ALL_STATES = {
   10: "DONE",
   11: "IGNORED", // will not do this 
   12: "UNPAID", // payment transaction failed, reamins unpaid
+  13: "FAILED",
   19: "REJECTED",   
-  20: "APPROVED"
+  20: "APPROVED",
+  99: "?" // UNKNOWN STATE
 }
 
 const COMMUNITY_STATES = [1,2,3,19,20]; // DRAFT,CANCELED,REVISION,REJECTED.APPROVED

@@ -3,7 +3,7 @@ import { NullifierMT, NullifierMTWitness } from "./generic-nullifier-mt.js";
 
 export {
   VoteInBatchLeaf,
-  VotesInBatchNullifier,
+  VotesInBatchMT,
   VotesInBatchWitness
 }
 
@@ -21,7 +21,7 @@ class VoteInBatchLeaf extends Struct({
   } 
 }
 
-class VotesInBatchNullifier extends NullifierMT {
+class VotesInBatchMT extends NullifierMT {
   constructor() {
     super(VoteInBatchLeaf);
   }
