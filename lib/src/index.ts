@@ -4,20 +4,13 @@ import { hashData } from "./evidence.js";
 import { sliced } from "./long-string.js";
 
 import {
-  NullifierMT,
-  NullifierMTWitness
-} from "./generic-nullifier-mt.js";
+  NullifierMTH16,
+  NullifierMTH16Witness
+} from "./nullifier-treeh16.js";
 
 import {
-  ElectorInClaimLeaf,
-  ElectorsInClaimNullifier
-} from "./electors-in-claim-nullifier.js";
-
-import {
-  VoteInBatchLeaf,
-  VotesInBatchMT,
-  VotesInBatchWitness
-} from "./votes-in-batch-mt.js";
+  NullifierMM
+} from "./nullifier-map.js";
 
 import {
   ALL_STATES, COMMUNITY_STATES, CLAIM_STATES, PERSON_STATES, 
@@ -32,13 +25,9 @@ export {
   UTCDateTime,
   hashData,
   sliced,
-  NullifierMT,
-  NullifierMTWitness,
-  ElectorInClaimLeaf,
-  ElectorsInClaimNullifier,
-  VoteInBatchLeaf,
-  VotesInBatchMT,
-  VotesInBatchWitness,
+  NullifierMTH16,
+  NullifierMTH16Witness,
+  NullifierMM,
 
   // states
   ALL_STATES,

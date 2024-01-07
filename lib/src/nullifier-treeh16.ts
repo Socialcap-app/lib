@@ -3,46 +3,59 @@ import { sliced } from "./long-string.js";
 import { DEBUG_LOG } from "./logs.js";
 
 export {
-  NullifierMTWitness,
-  NullifierMT,
+  NullifierMTH16Witness,
+  NullifierMTH16,
   MERKLE_HEIGHT,
 }
 
 
 // the specific Witness type to be used in contracts (max 2024 leafs)
-const MERKLE_HEIGHT = 12;
-class NullifierMTWitness extends MerkleWitness(MERKLE_HEIGHT) {}
+const MERKLE_HEIGHT = 16;
+class NullifierMTH16Witness extends MerkleWitness(MERKLE_HEIGHT) {}
 
-
-class NullifierMT {
+class NullifierMTH16 {
     // privates
     private merkleTree: MerkleTree;
     private index: bigint;
-    private leafClass: any;
+    private leafs: Field[];
 
-    constructor(instanceOf: any) {
+    constructor() {
       this.merkleTree = new MerkleTree(MERKLE_HEIGHT);
       this.index = 0n; // next free leaf slot
-      this.leafClass = instanceOf;
+      this.leafs = [];
     }
 
     build(leafs: { value: Field }[]): this {
       for (let j=0; j < (leafs || []).length; j++) {
         let index = this.index;
         this.merkleTree.setLeaf(index, leafs[j].value); 
+        this.leafs.push(leafs[j].value);
         this.index = this.index + 1n;
       }
       return this;
     }
 
-    addLeafs(leafs: any[]): this {
+    toJSON(): string {
+      return JSON.stringify(this.leafs);
+    }
+
+    fromJson(json: string): this {
+      let ls = JSON.parse(json); 
+      for (let j=0; j < (ls || []).length; j++) {
+        this.addLeafs([
+          { value: Field(ls[j] as string) }
+        ]);
+      }
+      return this;
+    }
+
+    addLeafs(leafs: { value: Field }[]): this {
       for (let j=0; j< (leafs || []).length; j++) {
         let index = this.index;
-
-        let value = (this.leafClass).value(leafs[j]);
+        let value = leafs[j].value;
         this.merkleTree.setLeaf(index, value); 
+        this.leafs.push(value);
         logLeaf(this.merkleTree, index, value);
-  
         this.index = this.index + 1n;
       }
       return this;
@@ -62,9 +75,9 @@ class NullifierMT {
       return this.merkleTree.getRoot();
     }
 
-    witness(index: bigint): NullifierMTWitness {
+    witness(index: bigint): NullifierMTH16Witness {
       let witness = this.merkleTree.getWitness(index);
-      const circuitWitness = new NullifierMTWitness(witness);
+      const circuitWitness = new NullifierMTH16Witness(witness);
       return circuitWitness;
     }
 
@@ -81,18 +94,18 @@ class NullifierMT {
 
 const logLeaf = (mt: MerkleTree, index: bigint, value: Field) => {
   if (! DEBUG_LOG) return;
-  console.log(`NullifierMT addLeafs()`
+  console.log(`NullifierMTH16 addLeafs()`
     +` root=${sliced(mt.getRoot().toString())} index=${index} witnessValue=${sliced(value.toString())}`);
 }
 
 const logWitness = (root: Field, index: bigint, value: Field) => {
   if (! DEBUG_LOG) return;
-  console.log(`NullifierMT addLeafs()`
+  console.log(`NullifierMTH16 addLeafs()`
     +` witnessRoot=${sliced(root.toString())} index=${index} witnessValue=${sliced(value.toString())}`);
 }
 
 const logAssert = (root: Field, witnessRoot: Field, asserted: boolean) => {
-  console.log(`NullifierMT assert()`
+  console.log(`NullifierMTH16 assert()`
     +` root=${sliced(root.toString())}`
     +` witnessRoot=${sliced(witnessRoot.toString())}`
     +` ${asserted ? 'ASSERTED' : 'FAILED'}`);
