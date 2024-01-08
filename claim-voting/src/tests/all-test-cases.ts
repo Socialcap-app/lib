@@ -1,5 +1,5 @@
 import { Field, PublicKey } from 'o1js';
-import { VotesInBatchNullifier } from '@socialcap/contracts-lib';
+import { BatchVoteNullifier, BatchVoteNullifierLeaf } from '@socialcap/batch-voting';
 import { VoteValue } from '../ClaimVotingContract.js';
 
 /*
@@ -9,28 +9,34 @@ import { VoteValue } from '../ClaimVotingContract.js';
 // All 3 votes are positive
 export function caseAllPositives(electors: PublicKey[]): {
   batches: any[],
-  nullis: VotesInBatchNullifier[]
+  nullis: BatchVoteNullifier[]
 } {
   const votes0 = [
     { electorPuk: electors[0], claimUid:  Field(1001), result: VoteValue.POSITIVE},
     { electorPuk: electors[0], claimUid:  Field(1002), result: VoteValue.POSITIVE},
     { electorPuk: electors[0], claimUid:  Field(1003), result: VoteValue.POSITIVE}
-  ]
-  const votesInBatch0 = (new VotesInBatchNullifier()).addLeafs(votes0);
+  ].map((t) => { return {
+    value: BatchVoteNullifierLeaf.value(t.electorPuk, t.claimUid, t.result)
+  }});
+  const votesInBatch0 = (new BatchVoteNullifier()).addLeafs(votes0);
   
   const votes1 = [
     { electorPuk: electors[1], claimUid:  Field(1001), result: VoteValue.POSITIVE},
     { electorPuk: electors[1], claimUid:  Field(1002), result: VoteValue.POSITIVE},
     { electorPuk: electors[1], claimUid:  Field(1003), result: VoteValue.POSITIVE}
-  ]
-  const votesInBatch1 = (new VotesInBatchNullifier()).addLeafs(votes1);
+  ].map((t) => { return {
+    value: BatchVoteNullifierLeaf.value(t.electorPuk, t.claimUid, t.result)
+  }});
+  const votesInBatch1 = (new BatchVoteNullifier()).addLeafs(votes1);
   
   const votes2 = [
     { electorPuk: electors[2], claimUid:  Field(1001), result: VoteValue.POSITIVE},
     { electorPuk: electors[2], claimUid:  Field(1002), result: VoteValue.POSITIVE},
     { electorPuk: electors[2], claimUid:  Field(1003), result: VoteValue.POSITIVE}
-  ]
-  const votesInBatch2 = (new VotesInBatchNullifier()).addLeafs(votes2);
+  ].map((t) => { return {
+    value: BatchVoteNullifierLeaf.value(t.electorPuk, t.claimUid, t.result)
+  }});
+  const votesInBatch2 = (new BatchVoteNullifier()).addLeafs(votes2);
 
   return {
     batches: [votes0, votes1, votes2],
@@ -41,28 +47,34 @@ export function caseAllPositives(electors: PublicKey[]): {
 // All 3 votes are negative
 export function caseAllNegatives(electors: PublicKey[]): {
   batches: any[],
-  nullis: VotesInBatchNullifier[]
+  nullis: BatchVoteNullifier[]
 } {
   const votes0 = [
     { electorPuk: electors[0], claimUid:  Field(1001), result: VoteValue.NEGATIVE},
     { electorPuk: electors[0], claimUid:  Field(1002), result: VoteValue.POSITIVE},
     { electorPuk: electors[0], claimUid:  Field(1003), result: VoteValue.POSITIVE}
-  ]
-  const votesInBatch0 = (new VotesInBatchNullifier()).addLeafs(votes0);
+  ].map((t) => { return {
+    value: BatchVoteNullifierLeaf.value(t.electorPuk, t.claimUid, t.result)
+  }});
+  const votesInBatch0 = (new BatchVoteNullifier()).addLeafs(votes0);
   
   const votes1 = [
     { electorPuk: electors[1], claimUid:  Field(1001), result: VoteValue.NEGATIVE},
     { electorPuk: electors[1], claimUid:  Field(1002), result: VoteValue.POSITIVE},
     { electorPuk: electors[1], claimUid:  Field(1003), result: VoteValue.POSITIVE}
-  ]
-  const votesInBatch1 = (new VotesInBatchNullifier()).addLeafs(votes1);
+  ].map((t) => { return {
+    value: BatchVoteNullifierLeaf.value(t.electorPuk, t.claimUid, t.result)
+  }});
+  const votesInBatch1 = (new BatchVoteNullifier()).addLeafs(votes1);
   
   const votes2 = [
     { electorPuk: electors[2], claimUid:  Field(1001), result: VoteValue.NEGATIVE},
     { electorPuk: electors[2], claimUid:  Field(1002), result: VoteValue.POSITIVE},
     { electorPuk: electors[2], claimUid:  Field(1003), result: VoteValue.POSITIVE}
-  ]
-  const votesInBatch2 = (new VotesInBatchNullifier()).addLeafs(votes2);
+  ].map((t) => { return {
+    value: BatchVoteNullifierLeaf.value(t.electorPuk, t.claimUid, t.result)
+  }});
+  const votesInBatch2 = (new BatchVoteNullifier()).addLeafs(votes2);
 
   return {
     batches: [votes0, votes1, votes2],
@@ -73,21 +85,25 @@ export function caseAllNegatives(electors: PublicKey[]): {
 // Only 2 total votes, even all of them are positive can not end 
 export function caseNotEnoughVotes(electors: PublicKey[]): {
   batches: any[],
-  nullis: VotesInBatchNullifier[]
+  nullis: BatchVoteNullifier[]
 } {
   const votes0 = [
     { electorPuk: electors[0], claimUid:  Field(1001), result: VoteValue.POSITIVE},
     { electorPuk: electors[0], claimUid:  Field(1002), result: VoteValue.POSITIVE},
     { electorPuk: electors[0], claimUid:  Field(1003), result: VoteValue.POSITIVE}
-  ]
-  const votesInBatch0 = (new VotesInBatchNullifier()).addLeafs(votes0);
+  ].map((t) => { return {
+    value: BatchVoteNullifierLeaf.value(t.electorPuk, t.claimUid, t.result)
+  }});
+  const votesInBatch0 = (new BatchVoteNullifier()).addLeafs(votes0);
   
   const votes1 = [
     { electorPuk: electors[1], claimUid:  Field(1001), result: VoteValue.POSITIVE},
     { electorPuk: electors[1], claimUid:  Field(1002), result: VoteValue.POSITIVE},
     { electorPuk: electors[1], claimUid:  Field(1003), result: VoteValue.POSITIVE}
-  ]
-  const votesInBatch1 = (new VotesInBatchNullifier()).addLeafs(votes1);
+  ].map((t) => { return {
+    value: BatchVoteNullifierLeaf.value(t.electorPuk, t.claimUid, t.result)
+  }});
+  const votesInBatch1 = (new BatchVoteNullifier()).addLeafs(votes1);
   
   return {
     batches: [votes0, votes1],
@@ -99,28 +115,34 @@ export function caseNotEnoughVotes(electors: PublicKey[]): {
 // Only 1 positive vote, even total votes is 3
 export function caseNotEnoughPositives(electors: PublicKey[]): {
   batches: any[],
-  nullis: VotesInBatchNullifier[]
+  nullis: BatchVoteNullifier[]
 } {
   const votes0 = [
     { electorPuk: electors[0], claimUid:  Field(1001), result: VoteValue.POSITIVE},
     { electorPuk: electors[0], claimUid:  Field(1002), result: VoteValue.POSITIVE},
     { electorPuk: electors[0], claimUid:  Field(1003), result: VoteValue.POSITIVE}
-  ]
-  const votesInBatch0 = (new VotesInBatchNullifier()).addLeafs(votes0);
+  ].map((t) => { return {
+    value: BatchVoteNullifierLeaf.value(t.electorPuk, t.claimUid, t.result)
+  }});
+  const votesInBatch0 = (new BatchVoteNullifier()).addLeafs(votes0);
   
   const votes1 = [
     { electorPuk: electors[1], claimUid:  Field(1001), result: VoteValue.ABSTAIN},
     { electorPuk: electors[1], claimUid:  Field(1002), result: VoteValue.POSITIVE},
     { electorPuk: electors[1], claimUid:  Field(1003), result: VoteValue.POSITIVE}
-  ]
-  const votesInBatch1 = (new VotesInBatchNullifier()).addLeafs(votes1);
+  ].map((t) => { return {
+    value: BatchVoteNullifierLeaf.value(t.electorPuk, t.claimUid, t.result)
+  }});
+  const votesInBatch1 = (new BatchVoteNullifier()).addLeafs(votes1);
   
   const votes2 = [
     { electorPuk: electors[2], claimUid:  Field(1001), result: VoteValue.ABSTAIN},
     { electorPuk: electors[2], claimUid:  Field(1002), result: VoteValue.POSITIVE},
     { electorPuk: electors[2], claimUid:  Field(1003), result: VoteValue.POSITIVE}
-  ]
-  const votesInBatch2 = (new VotesInBatchNullifier()).addLeafs(votes2);
+  ].map((t) => { return {
+    value: BatchVoteNullifierLeaf.value(t.electorPuk, t.claimUid, t.result)
+  }});
+  const votesInBatch2 = (new BatchVoteNullifier()).addLeafs(votes2);
 
   return {
     batches: [votes0, votes1, votes2],

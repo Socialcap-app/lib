@@ -1,10 +1,7 @@
 import { Mina, PrivateKey, PublicKey, Field, MerkleMapWitness } from 'o1js';
 import { ClaimVotingContract } from '../ClaimVotingContract.js';
-import { 
-  ElectorsInClaimNullifier, 
-  VotesInBatchNullifier, 
-  VotesInBatchWitness 
-} from '@socialcap/contracts-lib';
+import { ClaimElectorNullifier, ClaimElectorNullifierLeaf } from '../claim-elector-nullifier.js';
+import { BatchVoteNullifier, BatchVoteNullifierWitness } from '@socialcap/batch-voting';
 
 
 async function dispatchTheVote(
@@ -12,7 +9,7 @@ async function dispatchTheVote(
   sender: {puk: PublicKey, prk: PrivateKey}, // sender and voter MUST be the same!
   vote: Field, // +1 positive, -1 negative or 0 ignored
   batchRoot: Field,
-  batchWitness: VotesInBatchWitness, 
+  batchWitness: BatchVoteNullifierWitness, 
   nullifierRoot: Field,
   nullifierWitness: MerkleMapWitness
 ) {
@@ -61,9 +58,9 @@ async function dispatchTheVote(
 export async function dispatchTestCase(
   zkClaim: ClaimVotingContract,
   claimUid: Field,
-  testCase: { batches: any[], nullis: VotesInBatchNullifier[] },
+  testCase: { batches: any[], nullis: BatchVoteNullifier[] },
   electors: { puk: PublicKey, prk: PrivateKey }[],
-  electorsInClaim: ElectorsInClaimNullifier
+  electorsInClaim: ClaimElectorNullifier
 ) {
   for (let j=0; j < testCase.batches.length; j++) {
     let votes = testCase.batches[j];
@@ -77,7 +74,10 @@ export async function dispatchTestCase(
       nulli.root(),
       nulli.witness(0n),
       electorsInClaim.root(),
-      electorsInClaim.witness(electors[j].puk, claimUid)
+      electorsInClaim.witness(ClaimElectorNullifierLeaf.key(
+        electors[j].puk, 
+        claimUid
+      ))
     );
   }
 

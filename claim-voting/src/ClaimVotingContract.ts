@@ -1,7 +1,8 @@
 /**
  * ClaimVotingContract 
- * This is a varianr of the original IndividualClaimVotingContract, modified
- * to allow batch voting. 
+ * 
+ * This is a variant of the original IndividualClaimVotingContract as created
+ * for zkIgnite Cohort1, now modified to allow batch voting. 
  * 
  * Electors now send votes in batches and so we need to extract each vote
  * from the batch and then send them one by one to each ClaimVoting account.
@@ -9,18 +10,20 @@
  * To verify that the votes have note been tampered, we also receive the root
  * of a MerkleTree generated for the batch, settled in Mina by a transaction
  * to the VotingBatches contract. Each leaf in this tree is a Poseidon hash 
- * of [electorPubkey, claimUid, voteResult].
+ * of [planUid, electorPubkey, claimUid, voteResult].
  * 
  * To finally send each vote (a leaf) to the ClaimVoting account, we need a 
  * witness to this leaf, the root and also the electorPubkey, clamiUid and 
  * voteResult, so we can verify that this vote is in the batch MerkleTree 
  * before dispatching the VoteAction.
+ * 
+ * @MAZ 2023-09-12
  */
 import { SmartContract, state, State, method, Reducer, PublicKey } from "o1js";
 import { Field, Bool, Struct, Circuit } from "o1js";
 import { MerkleMapWitness } from "o1js";
-import { VoteInBatchLeaf, VotesInBatchWitness  } from "@socialcap/contracts-lib";
-import { ElectorInClaimLeaf } from "@socialcap/contracts-lib";
+import { BatchVoteNullifierLeaf, BatchVoteNullifierWitness  } from "@socialcap/batch-voting";
+import { ClaimElectorNullifierLeaf } from "./claim-elector-nullifier.js";
 
 
 export class VoteValue {
@@ -146,7 +149,7 @@ export class ClaimVotingContract extends SmartContract {
     // value ASSIGNED, other values indicate that the elector was 
     // never assigned to this claim or that he has already voted on it
     const [witnessRoot, witnessKey] = nullifierWitness.computeRootAndKey(
-      ElectorInClaimLeaf.ASSIGNED /* WAS ASSIGNED BUT NOT VOTED YET */
+      ClaimElectorNullifierLeaf.ASSIGNED /* WAS ASSIGNED BUT NOT VOTED YET */
     );
     // Circuit.log("assertHasNotVoted witnessRoot", witnessRoot);
     // Circuit.log("assertHasNotVoted witnessKey", witnessKey);
@@ -155,7 +158,7 @@ export class ClaimVotingContract extends SmartContract {
     nullifierRoot.assertEquals(witnessRoot, "Invalid elector root or already voted") ;
 
     // check the witness obtained key matchs the elector+claim key 
-    const key: Field = ElectorInClaimLeaf.key(electorPuk, claimUid);
+    const key: Field = ClaimElectorNullifierLeaf.key(electorPuk, claimUid);
     // Circuit.log("assertHasNotVoted recalculated Key", key);
 
     witnessKey.assertEquals(key, "Invalid elector key or already voted");
@@ -167,11 +170,9 @@ export class ClaimVotingContract extends SmartContract {
     claimUid: Field,
     vote: Field,
     batchRoot: Field,
-    batchWitness: VotesInBatchWitness
+    batchWitness: BatchVoteNullifierWitness
   ) {
-    let leafValue = VoteInBatchLeaf.value({
-      electorPuk: electorPuk, claimUid: claimUid, result: vote
-    });
+    let leafValue = BatchVoteNullifierLeaf.value(electorPuk, claimUid, vote);
     let recalculatedRoot = batchWitness.calculateRoot(leafValue);
     recalculatedRoot.assertEquals(batchRoot);  
   }
@@ -254,12 +255,29 @@ export class ClaimVotingContract extends SmartContract {
     });
   }
 
-
+  /**
+   * Dispatchs the vote as an action, and evaluates the result to check if
+   * all votes have been received and we can close voting for this claim. 
+   * 
+   * Uses the batch Nullifier (index -> hash(planUid,electorPuk,claimUid,result)) 
+   * to prove that this vote really belongs to this batch. 
+   * 
+   * Uses the plan Nullifier (hash(planUid,claimUid,electorPuk) -> status) to 
+   * check if the elector has been asigned to this claim and if the elector 
+   * has already voted in this claim. 
+   *
+   * @param electorPuk: the elector publick key
+   * @param vote: the vote value (+1, -1, 0) 
+   * @param batchRoot: root of the BatchNullifier 
+   * @param batchWitness: this particular vote witness in BatchVoteNullifier
+   * @param nullifierRoot: root of the ClaimElectorNullifier
+   * @param nullifierWitness:  this particular leaf witness in ClaimElectorNullifier
+   */
   @method dispatchVote(
     electorPuk: PublicKey, 
-    vote: Field, // +1 positive, +2 negative or 0 ignored
+    vote: Field, // +1 positive, -1 negative or 0 ignored
     batchRoot: Field,
-    batchWitness: VotesInBatchWitness, 
+    batchWitness: BatchVoteNullifierWitness, 
     nullifierRoot: Field,
     nullifierWitness: MerkleMapWitness
   ) {

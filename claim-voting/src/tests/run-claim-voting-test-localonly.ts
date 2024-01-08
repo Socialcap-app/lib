@@ -1,6 +1,6 @@
 import { Mina, PrivateKey, PublicKey, Field } from 'o1js';
 import { ClaimVotingInstance, deployClaimVotingContract } from "../claims-voting-factory.js";
-import { ElectorsInClaimNullifier } from '@socialcap/contracts-lib';
+import { ClaimElectorNullifier, ClaimElectorNullifierLeaf } from '../claim-elector-nullifier.js';
 import { dispatchTestCase } from './dispatch-test-case.js';
 import { APPROVED, REJECTED, VOTING } from '../ClaimVotingContract.js';
 import { 
@@ -9,6 +9,7 @@ import {
   caseNotEnoughVotes,
   caseNotEnoughPositives, 
 } from './all-test-cases.js';
+import { ASSIGNED } from '@socialcap/contracts-lib';
 
 // set instance
 const Local = Mina.LocalBlockchain({ proofsEnabled: true });
@@ -79,12 +80,12 @@ electors[4] = getLocalAccount(7);
 
 //// we need to build the electors Nullifier for assuring it has not voted twice ////
 
-let electorsInClaim = (new ElectorsInClaimNullifier())
-  .addElectors(claimUid, [ 
-    electors[0].puk, 
-    electors[1].puk, 
-    electors[2].puk, 
-    electors[3].puk 
+let electorsInClaim = (new ClaimElectorNullifier())
+  .addLeafs([ 
+    { key: ClaimElectorNullifierLeaf.key(electors[0].puk, claimUid), value: Field(ASSIGNED) } 
+    ,{ key: ClaimElectorNullifierLeaf.key(electors[1].puk, claimUid), value: Field(ASSIGNED) } 
+    ,{ key: ClaimElectorNullifierLeaf.key(electors[2].puk, claimUid), value: Field(ASSIGNED) } 
+    ,{ key: ClaimElectorNullifierLeaf.key(electors[3].puk, claimUid), value: Field(ASSIGNED) } 
   ]);
 
 let electorPuks = electors.map((t) => t.puk); // as an array of Pubkeys

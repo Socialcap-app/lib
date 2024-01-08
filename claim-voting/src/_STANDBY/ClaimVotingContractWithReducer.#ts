@@ -20,7 +20,7 @@
 import { SmartContract, state, State, method, Reducer, PublicKey } from "o1js";
 import { Field, Bool, Struct, Circuit } from "o1js";
 import { MerkleMapWitness } from "o1js";
-import { VoteInBatchLeaf, VotesInBatchWitness  } from "@socialcap/contracts-lib";
+import { BatchVoteNullifierLeaf, BatchVoteNullifierWitness  } from "@socialcap/contracts-lib";
 import { ElectorInClaimLeaf } from "@socialcap/contracts-lib";
 
 class Votes extends Struct({
@@ -173,9 +173,9 @@ export class ClaimVotingContract extends SmartContract {
     claimUid: Field,
     vote: Field,
     batchRoot: Field,
-    batchWitness: VotesInBatchWitness
+    batchWitness: BatchVoteNullifierWitness
   ) {
-    let leafValue = VoteInBatchLeaf.value({
+    let leafValue = BatchVoteNullifierLeaf.value({
       electorPuk: electorPuk, claimUid: claimUid, result: vote
     });
     let recalculatedRoot = batchWitness.calculateRoot(leafValue);
@@ -268,7 +268,7 @@ export class ClaimVotingContract extends SmartContract {
     electorPuk: PublicKey, 
     vote: Field, // +1 positive, -1 negative or 0 ignored
     batchRoot: Field,
-    batchWitness: VotesInBatchWitness, 
+    batchWitness: BatchVoteNullifierWitness, 
     nullifierRoot: Field,
     nullifierWitness: MerkleMapWitness
   ) {
