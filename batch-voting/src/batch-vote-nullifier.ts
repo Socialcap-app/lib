@@ -12,11 +12,15 @@ class BatchVoteNullifierLeaf extends Struct({
   claimUid: Field,
   result: Field
 }) {
-  static value(t: BatchVoteNullifierLeaf): Field {
+  static value(
+    electorPuk: PublicKey,
+    claimUid: Field,
+    result: Field
+  ): Field {
     return Poseidon.hash(
-      t.electorPuk.toFields()
-      .concat(t.claimUid.toFields())
-      .concat(t.result.toFields())
+      electorPuk.toFields()
+      .concat(claimUid.toFields())
+      .concat(result.toFields())
     );
   } 
 }

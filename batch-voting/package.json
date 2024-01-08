@@ -1,6 +1,6 @@
 {
   "name": "@socialcap/batch-voting",
-  "version": "0.1.3",
+  "version": "0.1.4",
   "description": "SocialCap Batch voting contracts for zkApp and API services",
   "author": "MAZito <mario@socialcap.app>",
   "license": "Apache-2.0",
