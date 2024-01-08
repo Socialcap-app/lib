@@ -65,7 +65,7 @@ function buildVotesBatch(
     uid: UID.toField(UID.uuid4()), // an unique Uid for this batch
     commited: mt.getRoot(), // the Root of the batch MerkleTree
     size: Field(votes.length), // Total number of votes received in this batch
-    submitedUTC: Field(0) 
+    submittedUTC: Field(0) 
   }
 }
 

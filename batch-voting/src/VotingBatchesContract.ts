@@ -114,6 +114,9 @@ class VotingBatchesContract extends SmartContract {
   // current Voting Batches MerkleTree commitment
   @state(Field) commitment = State<Field>(); 
 
+  // total number of batches commited
+  @state(Field) count = State<Field>();
+
   // final state of the voting process // 2: FINISHED, 1: ACTIVE
   @state(Field) votingState = State<Field>(); 
 
@@ -127,6 +130,7 @@ class VotingBatchesContract extends SmartContract {
     this.commitment.set(this.zeroRoot());
     this.votingState.set(Field(ACTIVE)); // it starts as an active voting
     this.actionsState.set(Reducer.initialActionState); // TODO: is this the right way to initialize this ???
+    this.count.set(Field(0));
   }
 
   zeroRoot(): Field {
@@ -143,8 +147,8 @@ class VotingBatchesContract extends SmartContract {
     planUid: Field,
     communityUid: Field,
   ) {
-    const _planUid = this.planUid.getAndAssertEquals();
-    const _communityUid = this.communityUid.getAndAssertEquals();
+    const _1 = this.planUid.getAndAssertEquals();
+    const _2 = this.communityUid.getAndAssertEquals();
     this.planUid.set(planUid);
     this.communityUid.set(communityUid);
   }

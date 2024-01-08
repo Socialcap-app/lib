@@ -71,6 +71,14 @@
       "feepayerAlias": "deployer.test",
       "fee": "0.3",
       "smartContract": "PlanVotingContractWithReducer"
+    },
+    "plan7": {
+      "url": "https://proxy.berkeley.minaexplorer.com/graphql",
+      "keyPath": "keys/plan7.json",
+      "feepayerKeyPath": "/home/mzito/.cache/zkapp-cli/keys/deployer.test.json",
+      "feepayerAlias": "deployer.test",
+      "fee": "0.3",
+      "smartContract": "VotingBatchesContract"
     }
   }
 }

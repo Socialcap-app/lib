@@ -2,7 +2,8 @@
 import { UID } from "./lib/uid.js";
 import { UTCDateTime } from "./lib/datetime.js";
 import { Add } from "./Add.js";
-import { VotingBatchesContract, ElectorsInPlanNullifierProxy } from "./VotingBatchesContract.js";
+import { BatchVoteNullifier, BatchVoteNullifierLeaf, BatchVoteNullifierWitness } from "./batch-vote-nullifier.js";
+import { VotingBatchesContract } from "./VotingBatchesContract.js";
 import {
   ALL_STATES, COMMUNITY_STATES, CLAIM_STATES, PERSON_STATES, 
   ELECTOR_STATES, PLAN_STATES, TASK_STATES,
@@ -28,5 +29,7 @@ export {
   // related to Contracts
   Add, // useful for testing
   VotingBatchesContract, 
-  ElectorsInPlanNullifierProxy, 
+  BatchVoteNullifier, 
+  BatchVoteNullifierWitness,
+  BatchVoteNullifierLeaf,
 };
