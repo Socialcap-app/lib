@@ -62,7 +62,7 @@ electors[4] = getLocalAccount(7);
   );
   let json = nullifier.toJSON(); 
 
-  let nullifier2 = (new NullifierMM()).fromJson(json);
+  let nullifier2 = (new NullifierMM()).fromJSON(json);
   let assert2 = nullifier2.assertLeaf(nullifier2.root(), 
     leafKeyN1(electors[3].puk, claimUid), 
     Field(ASSIGNED)
@@ -89,7 +89,7 @@ electors[4] = getLocalAccount(7);
 
   let json = nullifier.toJSON();
 
-  let nullifier2 = (new NullifierMTH16()).fromJson(json);
+  let nullifier2 = (new NullifierMTH16()).fromJSON(json);
   let assert2= nullifier2.assertLeaf(nullifier2.root(), 
     BigInt(lastIndex), 
     lastValue
