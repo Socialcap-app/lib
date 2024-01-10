@@ -37,6 +37,15 @@ class NullifierMM {
       return this;
     }
 
+    set(key: Field, value: Field) {
+      this.merkleMap.set(key, value); 
+      this.leafs.set(key, value); 
+    }
+
+    get(key: Field): Field {
+      return this.merkleMap.get(key); 
+    }
+
     toJSON(): string {
       return JSON.stringify(Object.fromEntries(this.leafs));      
     }
