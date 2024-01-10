@@ -34,6 +34,7 @@ export const
   FAILED = 13, 
   REJECTED = 19,   
   APPROVED = 20,
+  TALLYING = 21,
   UNKNOWN = 99
 ;
 
@@ -53,6 +54,7 @@ const ALL_STATES = {
   13: "FAILED",
   19: "REJECTED",   
   20: "APPROVED",
+  21: "TALLYING",
   99: "?" // UNKNOWN STATE
 }
 
