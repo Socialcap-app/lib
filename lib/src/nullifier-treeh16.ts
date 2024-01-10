@@ -39,7 +39,7 @@ class NullifierMTH16 {
       return JSON.stringify(this.leafs);
     }
 
-    fromJson(json: string): this {
+    fromJSON(json: string): this {
       let ls = JSON.parse(json); 
       for (let j=0; j < (ls || []).length; j++) {
         this.addLeafs([

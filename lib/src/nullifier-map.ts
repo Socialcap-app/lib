@@ -41,7 +41,7 @@ class NullifierMM {
       return JSON.stringify(Object.fromEntries(this.leafs));      
     }
 
-    fromJson(json: string): this {
+    fromJSON(json: string): this {
       let map = new Map(Object.entries(JSON.parse(json))); 
       map.forEach((value, key) => {
         this.addLeafs([
