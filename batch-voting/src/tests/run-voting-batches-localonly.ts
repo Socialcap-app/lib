@@ -1,8 +1,9 @@
 import { Mina, PrivateKey, PublicKey, Field, AccountUpdate } from 'o1js';
-import { addElectorsToNullifier, getNullifierProxy } from '../helpers/nullifiers.js';
+import { addElectorsToNullifier } from '../helpers/nullifiers.js';
 import { buildVotesBatch, mergeAllBatches } from '../helpers/voting-batches.js';
 import { VotingBatchesContract } from '../VotingBatchesContract.js';
 import { UID } from "../lib/uid.js";
+import { PlanElectorNullifierLeaf } from '../plan-elector-nullifier.js';
 
 
 ///////////////////////////////////////////////////////////////////////////////
@@ -117,8 +118,8 @@ let nullifier = addElectorsToNullifier(
   [ electors[0].puk, electors[1].puk, electors[2].puk, electors[3].puk ]
 );
 
-let null00 = getNullifierProxy(nullifier, electors[0].puk, planUid);
-
+// let null00 = NullifierProxy(nullifier, electors[0].puk, planUid);
+let null00 = nullifier.getLeaf(electors[0].puk, planUid);
 
 ///////////////////////////////////////////////////////////////////////////////
 /// Now prepare batch of vote (with its MerkleMap) 

@@ -1,10 +1,10 @@
 import { SmartContract, state, State, method, Reducer, PublicKey } from "o1js";
-import { Field, Struct, Circuit, Poseidon } from "o1js";
-import { MerkleMapWitness, MerkleMap, MerkleWitness } from "o1js";
+import { Field, Struct, Circuit } from "o1js";
+import { MerkleMap, MerkleWitness } from "o1js";
+import { PlanElectorNullifierLeaf } from "./plan-elector-nullifier.js";
 
 export {
   VotesBatch, 
-  ElectorsInPlanNullifierProxy, 
   VotingBatchesContract,
   VotingBatchesWitness,
   MERKLE_HEIGHT
@@ -54,26 +54,6 @@ const
   ASSIGNED = Field(1),   // assigned to elector but has not voted yet
   VOTED = Field(2);      // assigned to elector and has already voted
 
-/** 
- * 
-*/
-class ElectorsInPlanNullifierProxy extends Struct({
-  root: Field,
-  witness: MerkleMapWitness
-}) {
-  static key(
-    electorId: PublicKey,
-    planUid: Field
-  ): Field {
-    // Circuit.log(electorId, planUid)
-    const keyd = Poseidon.hash(
-      electorId.toFields()
-      .concat(planUid.toFields())
-    );
-    Circuit.log("Key (",electorId, planUid, ") =>", keyd)
-    return keyd;
-  } 
-}
 
 
 /**
@@ -159,13 +139,13 @@ class VotingBatchesContract extends SmartContract {
   @method assertIsValidElector(
     electorPuk: PublicKey,
     planUid: Field,
-    nullifier: ElectorsInPlanNullifierProxy
+    nullifier: PlanElectorNullifierLeaf
   ) {
     // compute a root and key from the given Witness using the only valid 
     // value ASSIGNED, other values indicate that the elector was 
     // never assigned to this claim or that he has already voted on it
     const [witnessRoot, witnessKey] = nullifier.witness.computeRootAndKey(
-      ASSIGNED /* WAS ASSIGNED */
+      PlanElectorNullifierLeaf.ASSIGNED /* WAS ASSIGNED */
     );
     Circuit.log("assertIsValidElector witnessRoot", witnessRoot);
     Circuit.log("assertIsValidElector witnessKey", witnessKey);
@@ -173,8 +153,9 @@ class VotingBatchesContract extends SmartContract {
     // check the witness obtained root matchs the Nullifier root
     nullifier.root.assertEquals(witnessRoot, "Invalid elector root") ;
 
-    // check the witness obtained key matchs the elector+claim key 
-    const key: Field = ElectorsInPlanNullifierProxy.key(electorPuk, planUid);
+    // check the witness obtained key matchs the elector+plan key 
+    const key: Field = PlanElectorNullifierLeaf.getKey(electorPuk, planUid);
+    nullifier.key.assertEquals(key);
     Circuit.log("assertIsValidElector recalculated Key", key);
 
     witnessKey.assertEquals(key, "Invalid elector key");
@@ -186,7 +167,7 @@ class VotingBatchesContract extends SmartContract {
    */
   @method receiveVotesBatch(
     votesBatch: VotesBatch,
-    nullifier: ElectorsInPlanNullifierProxy
+    nullifier: PlanElectorNullifierLeaf
   ) {
     const planUid = this.planUid.getAndAssertEquals();
     const communityUid = this.communityUid.getAndAssertEquals();
@@ -201,7 +182,7 @@ class VotingBatchesContract extends SmartContract {
     electorPuk.assertEquals(this.sender);
     
     // check this elector is part of the Electors set 
-    Circuit.log("elector key=", ElectorsInPlanNullifierProxy.key(electorPuk, planUid));
+    Circuit.log("elector key=", nullifier.key);
     this.assertIsValidElector(electorPuk, planUid, nullifier);
 
     // check that we have not already finished 

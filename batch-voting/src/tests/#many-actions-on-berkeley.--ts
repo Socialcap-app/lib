@@ -1,5 +1,5 @@
 import { Mina, PrivateKey, PublicKey, Field, AccountUpdate } from 'o1js';
-import { addElectorsToNullifier, getNullifierProxy } from '../helpers/nullifiers.js';
+import { addElectorsToNullifier } from '../helpers/nullifiers.js';
 import { buildVotesBatch, mergeAllBatches } from '../helpers/voting-batches.js';
 import { VotingBatchesContract } from '../VotingBatchesContract.js';
 import { UID } from "../lib/uid.js";
