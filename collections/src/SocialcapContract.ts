@@ -54,7 +54,6 @@ export class SocialcapContract extends SmartContract {
       send: Permissions.proof(),
       setDelegate: Permissions.proof(),
       setPermissions: Permissions.proof(),
-      setVerificationKey: Permissions.proof(),
       setZkappUri: Permissions.proof(),
       setTokenSymbol: Permissions.proof(),
       incrementNonce: Permissions.proof(),

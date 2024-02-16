@@ -1,6 +1,3 @@
-import { UID } from "./lib/uid.js";
-import { UTCDateTime } from "./lib/datetime.js";
-
 import { ProvableCommunity, CommunityState } from "./models/provable-community.js";
 import { ProvablePerson, PersonState } from "./models/provable-person.js";
 import { ProvableMember, MemberRole } from "./models/provable-member.js";
@@ -15,25 +12,12 @@ import { MerkleMapProxy, MerkleMapUpdate, LeafInstance } from "./CommunitiesCont
 import { CommunitiesContract } from "./CommunitiesContract.js";
 import { ClaimingsContract } from "./ClaimingsContract.js";
 import { ElectorsContract } from "./ElectorsContract.js";
-import { ClaimVotingContract, NullifierProxy } from "./ClaimVotingContract.js";
-import { VotingInstance, ClaimsVotingFactory } from "./claims-voting-factory.js";
-
-import {
-  ALL_STATES, COMMUNITY_STATES, CLAIM_STATES, PERSON_STATES, 
-  ELECTOR_STATES, PLAN_STATES, TASK_STATES,
-  NONE, DRAFT, CANCELED, REVISION, CLAIMED, VOTING,  
-  ASSIGNED, ACTIVE, WAITING, DONE, IGNORED, UNPAID,
-  REJECTED, APPROVED
-} from "./models/states.js";
 
 export { 
   SocialcapContract,
   CommunitiesContract,
   ClaimingsContract,
   ElectorsContract,
-  ClaimVotingContract,
-  VotingInstance,
-  ClaimsVotingFactory,
   ProvableCommunity, 
   CommunityState,
   ProvablePerson,
@@ -45,20 +29,7 @@ export {
   ProvableTask,
   ProvableElector,
   MemberRole,
-  UID,
-  UTCDateTime,
   MerkleMapProxy,
   MerkleMapUpdate,
   LeafInstance,
-  NullifierProxy,
-  ALL_STATES,
-  COMMUNITY_STATES,
-  CLAIM_STATES,
-  PERSON_STATES,
-  ELECTOR_STATES,
-  PLAN_STATES,
-  TASK_STATES,
-  NONE, DRAFT, CANCELED, REVISION, CLAIMED, VOTING,  
-  ASSIGNED, ACTIVE, WAITING, DONE, IGNORED, UNPAID,
-  REJECTED, APPROVED
 };
