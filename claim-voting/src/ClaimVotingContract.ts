@@ -151,15 +151,15 @@ export class ClaimVotingContract extends SmartContract {
     const [witnessRoot, witnessKey] = nullifierWitness.computeRootAndKey(
       ClaimElectorNullifierLeaf.ASSIGNED /* WAS ASSIGNED BUT NOT VOTED YET */
     );
-    // Circuit.log("assertHasNotVoted witnessRoot", witnessRoot);
-    // Circuit.log("assertHasNotVoted witnessKey", witnessKey);
+    Circuit.log("assertHasNotVoted witnessRoot", witnessRoot);
+    Circuit.log("assertHasNotVoted witnessKey", witnessKey);
 
     // check the witness obtained root matchs the Nullifier root
     nullifierRoot.assertEquals(witnessRoot, "Invalid elector root or already voted") ;
 
     // check the witness obtained key matchs the elector+claim key 
     const key: Field = ClaimElectorNullifierLeaf.key(electorPuk, claimUid);
-    // Circuit.log("assertHasNotVoted recalculated Key", key);
+    Circuit.log("assertHasNotVoted recalculated Key", key);
 
     witnessKey.assertEquals(key, "Invalid elector key or already voted");
   }
@@ -283,7 +283,7 @@ export class ClaimVotingContract extends SmartContract {
   ) {
     const claimUid = this.claimUid.get();
     this.claimUid.assertEquals(claimUid);
-    // Circuit.log("dispatchVote for claimUid=", claimUid);
+    Circuit.log("dispatchVote for claimUid=", claimUid);
     
     // check if this elector has already voted in the claimUid
     this.assertHasNotVoted(
@@ -305,7 +305,7 @@ export class ClaimVotingContract extends SmartContract {
       ignore: Circuit.if(vote.equals(VoteValue.ABSTAIN), Bool(true), Bool(false))
     };
     this.reducer.dispatch(action);  
-    // Circuit.log("dispatched action", action);
+    Circuit.log("dispatched action", action);
 
     // send event to change this elector state in Nullifier
     this.emitEvent("elector-has-voted", {
