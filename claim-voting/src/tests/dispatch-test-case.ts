@@ -4,7 +4,7 @@ import { ClaimElectorNullifier, ClaimElectorNullifierLeaf } from '../claim-elect
 import { BatchVoteNullifier, BatchVoteNullifierWitness } from '@socialcap/batch-voting';
 
 
-async function dispatchTheVote(
+export async function dispatchTheVote(
   zkClaim: ClaimVotingContract,
   sender: {puk: PublicKey, prk: PrivateKey}, // sender and voter MUST be the same!
   vote: Field, // +1 positive, -1 negative or 0 ignored
@@ -67,18 +67,20 @@ export async function dispatchTestCase(
     let nulli = testCase.nullis[j];
   
     // now we dispatch the votes for this claim in each batch
-    await dispatchTheVote(
-      zkClaim, 
-      electors[j],
-      votes[0].result, // first batch
-      nulli.root(),
-      nulli.witness(0n),
-      electorsInClaim.root(),
-      electorsInClaim.witness(ClaimElectorNullifierLeaf.key(
-        electors[j].puk, 
-        claimUid
-      ))
-    );
+    for (let k=0; k < votes.length; k++) {
+      await dispatchTheVote(
+        zkClaim, 
+        electors[j],
+        votes[k].result, // first batch
+        nulli.root(),
+        nulli.witness(BigInt(k)),
+        electorsInClaim.root(),
+        electorsInClaim.witness(ClaimElectorNullifierLeaf.key(
+          electors[j].puk, 
+          claimUid
+        ))
+      );
+    }
   }
 
   let result = zkClaim.result.get();
