@@ -174,7 +174,9 @@ export class ClaimVotingContract extends SmartContract {
   ) {
     let leafValue = BatchVoteNullifierLeaf.value(electorPuk, claimUid, vote);
     let recalculatedRoot = batchWitness.calculateRoot(leafValue);
-    recalculatedRoot.assertEquals(batchRoot);  
+    Circuit.log("assertIsInBatch batchRoot", batchRoot);
+    Circuit.log("assertIsInBatch recalculatedRoot", recalculatedRoot);
+    recalculatedRoot.assertEquals(batchRoot, "Invalid vote not in batch");  
   }
 
 

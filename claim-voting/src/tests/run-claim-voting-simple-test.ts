@@ -80,8 +80,8 @@ const bvnullified = (votes: any[]) => {
 {
   const votes = [
     { electorPuk: electors[0].puk, claimUid:  Field(1001), result: VoteValue.POSITIVE},
-    { electorPuk: electors[1].puk, claimUid:  Field(1002), result: VoteValue.POSITIVE},
-    { electorPuk: electors[2].puk, claimUid:  Field(1003), result: VoteValue.POSITIVE}
+    { electorPuk: electors[1].puk, claimUid:  Field(1001), result: VoteValue.POSITIVE},
+    { electorPuk: electors[2].puk, claimUid:  Field(1001), result: VoteValue.POSITIVE}
   ];
   const votesInBatch = bvnullified(votes);
   
