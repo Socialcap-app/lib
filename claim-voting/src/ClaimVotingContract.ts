@@ -22,6 +22,7 @@
 import { SmartContract, state, State, method, Reducer, PublicKey } from "o1js";
 import { Field, Bool, Struct, Circuit } from "o1js";
 import { MerkleMapWitness } from "o1js";
+import { ASSIGNED } from "@socialcap/contracts-lib";
 import { BatchVoteNullifierLeaf, BatchVoteNullifierWitness  } from "@socialcap/batch-voting";
 import { ClaimElectorNullifierLeaf } from "./claim-elector-nullifier.js";
 
@@ -149,18 +150,17 @@ export class ClaimVotingContract extends SmartContract {
     // value ASSIGNED, other values indicate that the elector was 
     // never assigned to this claim or that he has already voted on it
     const [witnessRoot, witnessKey] = nullifierWitness.computeRootAndKey(
-      ClaimElectorNullifierLeaf.ASSIGNED /* WAS ASSIGNED BUT NOT VOTED YET */
+      Field(ASSIGNED) /* WAS ASSIGNED BUT NOT VOTED YET */
     );
+    const key: Field = ClaimElectorNullifierLeaf.key(electorPuk, claimUid);
     Circuit.log("assertHasNotVoted witnessRoot", witnessRoot);
     Circuit.log("assertHasNotVoted witnessKey", witnessKey);
+    Circuit.log("assertHasNotVoted nullifierKey", key);
 
     // check the witness obtained root matchs the Nullifier root
     nullifierRoot.assertEquals(witnessRoot, "Invalid elector root or already voted") ;
 
     // check the witness obtained key matchs the elector+claim key 
-    const key: Field = ClaimElectorNullifierLeaf.key(electorPuk, claimUid);
-    Circuit.log("assertHasNotVoted recalculated Key", key);
-
     witnessKey.assertEquals(key, "Invalid elector key or already voted");
   }
 
