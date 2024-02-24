@@ -1,6 +1,6 @@
 {
   "name": "@socialcap/claim-voting",
-  "version": "0.1.8",
+  "version": "0.1.9",
   "description": "SocialCap ClaimVoting zkApp",
   "author": "MAZito <mario@socialcap.app>",
   "license": "Apache-2.0",
