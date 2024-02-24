@@ -2,14 +2,13 @@ import { Mina, PrivateKey, PublicKey, Field } from 'o1js';
 import { ClaimVotingInstance, deployClaimVotingContract } from "../claims-voting-factory.js";
 import { ClaimElectorNullifier, ClaimElectorNullifierLeaf } from '../claim-elector-nullifier.js';
 import { dispatchTestCase } from './dispatch-test-case.js';
-import { APPROVED, REJECTED, VOTING } from '../ClaimVotingContract.js';
 import { 
   caseAllPositives, 
   caseAllNegatives,
   caseNotEnoughVotes,
   caseNotEnoughPositives, 
 } from './all-test-cases.js';
-import { ASSIGNED } from '@socialcap/contracts-lib';
+import { VOTING, APPROVED, REJECTED, ASSIGNED } from '@socialcap/contracts-lib';
 
 // set instance
 const Local = Mina.LocalBlockchain({ proofsEnabled: true });

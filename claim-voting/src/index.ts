@@ -6,7 +6,6 @@ import {
 
 import { 
   VoteValue,
-  VOTING, APPROVED, REJECTED, CANCELED,
   ClaimVotingContract 
 } from "./ClaimVotingContract.js";
 
@@ -17,7 +16,6 @@ import {
 
 export { 
   VoteValue,
-  VOTING, APPROVED, REJECTED, CANCELED,
   ClaimVotingContract,
   ClaimVotingInstance,
   ClaimElectorNullifier,

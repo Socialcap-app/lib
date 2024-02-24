@@ -22,7 +22,7 @@
 import { SmartContract, state, State, method, Reducer, PublicKey } from "o1js";
 import { Field, Bool, Struct, Circuit } from "o1js";
 import { MerkleMapWitness } from "o1js";
-import { ASSIGNED } from "@socialcap/contracts-lib";
+import { ASSIGNED, VOTING, APPROVED, REJECTED } from "@socialcap/contracts-lib";
 import { BatchVoteNullifierLeaf, BatchVoteNullifierWitness  } from "@socialcap/batch-voting";
 import { ClaimElectorNullifierLeaf } from "./claim-elector-nullifier.js";
 
@@ -57,13 +57,6 @@ class VotingStatusEvent extends Struct({
   negative: Field,
   ignored: Field
 }) {}
-
-// Final result states  
-export const 
-  VOTING = Field(0),   // Claim is still in the voting process
-  APPROVED = Field(1),
-  REJECTED = Field(2),
-  CANCELED = Field(3); // TODO: not sure how can we change this state ?
 
 
 export class ClaimVotingContract extends SmartContract {
@@ -105,7 +98,7 @@ export class ClaimVotingContract extends SmartContract {
     this.ignored.set(Field(0));
     this.requiredVotes.set(Field(0));
     this.requiredPositives.set(Field(0));
-    this.result.set(Field(0));
+    this.result.set(Field(VOTING));
     this.actionsState.set(Reducer.initialActionState); // TODO: is this the right way to initialize this ???
   }
 
@@ -192,7 +185,7 @@ export class ClaimVotingContract extends SmartContract {
     // check that this claim is still open (in the voting process)
     const currentResult = this.result.get();
     this.result.assertEquals(currentResult);
-    currentResult.assertEquals(VOTING, /*ELSE*/"Voting has already finished !");
+    currentResult.assertEquals(Field(VOTING), /*ELSE*/"Voting has already finished !");
 
     // get current votes state
     let positives = this.positive.getAndAssertEquals();
@@ -232,7 +225,7 @@ export class ClaimVotingContract extends SmartContract {
 
     // now evaluate final result
     let newResult = Circuit.if(isFinished, 
-      Circuit.if(isApproved, APPROVED, REJECTED),
+      Circuit.if(isApproved, Field(APPROVED), Field(REJECTED)),
       result
     );
     // Circuit.log("addVote result,isFinished,isApproved=", newResult, isFinished, isApproved);
@@ -318,9 +311,9 @@ export class ClaimVotingContract extends SmartContract {
 
     // finally we add this vote to the count ! 
     // we can check final result using 
-    // zkApp.result.get() === VOTING still voting
-    // zkApp.result.get() === APPROVED
-    // zkApp.result.get() === REJECTED
+    // zkApp.result.get() === Field(VOTING) still voting
+    // zkApp.result.get() === Field(APPROVED)
+    // zkApp.result.get() === Field(REJECTED)
     this.sumVotes(action);
   }
 }
