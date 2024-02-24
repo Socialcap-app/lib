@@ -146,9 +146,9 @@ export class ClaimVotingContract extends SmartContract {
       Field(ASSIGNED) /* WAS ASSIGNED BUT NOT VOTED YET */
     );
     const key: Field = ClaimElectorNullifierLeaf.key(electorPuk, claimUid);
-    Circuit.log("assertHasNotVoted witnessRoot", witnessRoot);
-    Circuit.log("assertHasNotVoted witnessKey", witnessKey);
-    Circuit.log("assertHasNotVoted nullifierKey", key);
+    // Circuit.log("assertHasNotVoted witnessRoot", witnessRoot);
+    // Circuit.log("assertHasNotVoted witnessKey", witnessKey);
+    // Circuit.log("assertHasNotVoted nullifierKey", key);
 
     // check the witness obtained root matchs the Nullifier root
     nullifierRoot.assertEquals(witnessRoot, "Invalid elector root or already voted") ;
@@ -167,8 +167,8 @@ export class ClaimVotingContract extends SmartContract {
   ) {
     let leafValue = BatchVoteNullifierLeaf.value(electorPuk, claimUid, vote);
     let recalculatedRoot = batchWitness.calculateRoot(leafValue);
-    Circuit.log("assertIsInBatch batchRoot", batchRoot);
-    Circuit.log("assertIsInBatch recalculatedRoot", recalculatedRoot);
+    // Circuit.log("assertIsInBatch batchRoot", batchRoot);
+    // Circuit.log("assertIsInBatch recalculatedRoot", recalculatedRoot);
     recalculatedRoot.assertEquals(batchRoot, "Invalid vote not in batch");  
   }
 
@@ -278,7 +278,7 @@ export class ClaimVotingContract extends SmartContract {
   ) {
     const claimUid = this.claimUid.get();
     this.claimUid.assertEquals(claimUid);
-    Circuit.log("dispatchVote for claimUid=", claimUid);
+    // Circuit.log("dispatchVote for claimUid=", claimUid);
     
     // check if this elector has already voted in the claimUid
     this.assertHasNotVoted(
@@ -300,7 +300,7 @@ export class ClaimVotingContract extends SmartContract {
       ignore: Circuit.if(vote.equals(VoteValue.ABSTAIN), Bool(true), Bool(false))
     };
     this.reducer.dispatch(action);  
-    Circuit.log("dispatched action", action);
+    // Circuit.log("dispatched action", action);
 
     // send event to change this elector state in Nullifier
     this.emitEvent("elector-has-voted", {
