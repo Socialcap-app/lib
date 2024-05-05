@@ -1,0 +1,22 @@
+{
+  "version": 1,
+  "deployAliases": {
+    "pay1": {
+      "networkId": "testnet",
+      "url": "https://proxy.berkeley.minaexplorer.com/graphql",
+      "keyPath": "keys/pay1.json",
+      "feepayerKeyPath": "/home/mzito/.cache/zkapp-cli/keys/deployer.test.json",
+      "feepayerAlias": "deployer.test",
+      "fee": "0.25",
+      "smartContract": "SocialcapDeposits"
+    },
+    "pay2": {
+      "networkId": "devnet",
+      "url": "https://api.minascan.io/node/devnet/v1/graphql",
+      "keyPath": "keys/pay2.json",
+      "feepayerKeyPath": "/home/mzito/.cache/zkapp-cli/keys/deployer.devnet.json",
+      "feepayerAlias": "deployer.devnet",
+      "fee": "0.3"
+    }
+  }
+}
