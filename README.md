@@ -1,35 +1,35 @@
-# Socialcap ZK Contracts
+# Mina zkApp: @socialcap/lib
 
-These are the different ZK contracts and tools used by Socialcap to settle on-chain voting.
+A Lib with utilities and helpers for SocialCap UI, API and Contracts.
 
-- **batch-voting**: The contract use to settle batches of votes submitted by electors when voting for a set of claims.
+This template uses TypeScript.
 
-- **claim-voting**: The contract used to vote for a given claim and calculate the result.
+### How to build
 
-- **collections**: The contract for settling a given collection MerkleMap commitment.
+```sh
+npm run build
+```
 
-- **models**: The set of "provable" entity definitions used by the API or UI.
+### Publish to NPM
+~~~
+npm publish --access public
+~~~
 
-- **lib**: Utility libs used by other contracts, the API or the UI.
+### Use it
 
-The corresponding `npm` packages are:
+Install in client
+~~~
+npm i @socialcap/lib
+~~~
 
-- @socialcap/batch-voting-contracts
-- @socialcap/claim-voting-contracts
-- @socialcap/collection-contracts
-- @socialcap/contracts-models
-- @socialcap/contracts-lib
+Import it
+~~~
+import { 
+  UID,
+  UTCDateTime,
+} from "@socialcap/lib";
+~~~
 
-### To do
+## License
 
-- 
-
-### Changelog
-
-2023-11-27 
-- ClaimVotingContract now reduces on each vote, tested
-- contracts-lib 0.1.5 implements generic nullifier MT, tested
-
-2023-11-25 
-- updated to o1js 0.14.2
-- refactored socialcap contracts into different folders
+[Apache-2.0](LICENSE)
